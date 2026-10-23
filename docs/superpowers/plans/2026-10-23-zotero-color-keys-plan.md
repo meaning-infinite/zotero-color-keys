@@ -50,18 +50,19 @@ pnpm start   # 本地装插件冒烟
 
 done：`pnpm build` 产出 `.scaffold/build/*.xpi`；`pnpm typecheck` 无错。
 
-### 0.3 spike（硬门禁）
+### 0.3 spike（已完成，主路径成立）
 
-在 Zotero devtools 控制台验证 4 件事：
+结论详见 `docs/spike/2026-10-23-editor-hook.md` + `docs/spike/color-keys-spike-report.json`：
 
-1. `typeof Zotero.Notes.registerEditorInstance` 是否为函数，签名与调用时机
-2. 实例对象上如何拿到 iframe window、ProseMirror `view`/`schema`（记录精确属性路径：`_editorCore` / `_iframeWindow.wrappedJSObject` 等）
-3. 能否用 `view.dispatch(view.state.tr.addMark(...))` 写入 `textColor`、`backgroundColor` 并落盘（保存后重开笔记确认）
-4. 无选区时 `$from.blockRange($from)` 能否覆盖整段
+1. `Zotero.Notes.registerEditorInstance(instance)` 存在；在 `init()` 第一行调用，**hook 时实例字段不全**，必须延迟轮询
+2. view 路径实测：`instance._iframeWindow.wrappedJSObject._currentEditorInstance._editorCore.view`；schema marks 含 `textColor`/`backgroundColor`
+3. `view.dispatch(state.tr.addMark(...))` 可写入并落盘：`itemNotes.note` 中为 `<span style="color: rgb(255, 32, 32);">`
+4. 坑：attrs 必须用 `new iframeWindow.Object()` 在 iframe realm 构造；chrome plain object 报 `RangeError: No value supplied for attribute color`
+5. 同一笔记有 pane + tab 两个实例，需要去重
 
-产出：`docs/spike/2026-10-23-editor-hook.md`，含代码片段、属性路径、结论（走主路径 / 退路）。
+bonus 未验证但风险低：无选区 `blockRange` 段落语义在阶段 3 验证。
 
-done：spike 文档结论明确，且写入 mark 后重开笔记颜色仍在。
+done：✅ 主路径验证通过，退路不需要启用。
 
 ## 阶段 1：纯逻辑库
 

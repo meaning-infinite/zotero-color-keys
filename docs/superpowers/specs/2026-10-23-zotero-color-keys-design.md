@@ -64,13 +64,17 @@ TypeScript + esbuild（由 `zotero-plugin-scaffold` 驱动）+ `zotero-plugin-to
 
 依赖方向：`index.ts` → registry/prefs/bnBridge → colorCommands → keymap。keymap 不 import 任何 Zotero API，保证可单测。
 
-### 4.3 快捷键挂载（关键技术决策）
+### 4.3 快捷键挂载（关键技术决策，已由 spike 验证）
 
 - 不能用 toolkit `Keyboard`：它只给主窗口与 reader iframe 绑定 keydown，笔记编辑器在独立 iframe，事件不跨帧冒泡
 - 不能用 `XUL <key>`：同类原因，且无作用域控制
-- 采用：在 `startup` 中包装 `Zotero.Notes.registerEditorInstance`（BN 也用 `PatchHelper` 包装同一函数，采用链式包装，先调用原函数再挂自己的监听，不替换他人逻辑）
-- 每个实例：在其 iframe window 上 `addEventListener("keydown", handler, true)`（捕获阶段，早于 ProseMirror 自身 keymap）；`shutdown`/实例销毁时移除
-- 若 `registerEditorInstance` 形态不符（spike 失败）：退路为遍历 `Zotero.Notes._editorInstances` 轮询 + `MutationObserver` 监听 `note-editor` 挂载；两条路径共用同一 `attachEditor(instance)` 接口
+- 采用：包装 `Zotero.Notes.registerEditorInstance`（Zotero 10 实测存在，签名 `(instance)`；BN 也用 `PatchHelper` 包装同一函数，采用链式包装，先调用原函数再挂自己的监听，不替换他人逻辑）
+- **时序**：该方法在 `EditorInstance.init()` 第一行被调用，此时 `_iframeWindow`/`_item` 尚未赋值 → hook 内只登记实例，随后轮询（500ms，最多 20s）直到 `instance._iframeWindow` 与编辑器 view 就绪再挂 keydown
+- **view 路径**（实测命中）：`instance._iframeWindow.wrappedJSObject._currentEditorInstance._editorCore.view`
+- **mark 写入**：`view.state.tr.addMark(from, to, mark)` + `view.dispatch(tr)`；attrs 必须用 `new iframeWindow.Object()` 在编辑器 iframe realm 内创建，chrome 侧普通对象会抛 `RangeError: No value supplied for attribute color`（Xray）
+- 同一笔记存在两个实例（`viewMode: "library"` 面板预览 + `viewMode: "tab"` 标签页），都要挂监听；按 `itemID` 去重，一次按键只处理一次
+- 每个实例：iframe window 上 `addEventListener("keydown", handler, true)`（捕获阶段，早于 ProseMirror 自身 keymap）；`shutdown` 与实例 `uninit` 时移除
+- 证据与完整报告：`docs/spike/2026-10-23-editor-hook.md`、`docs/spike/color-keys-spike-report.json`；主路径已验证，4.3 退路无需启用
 
 ### 4.4 数据流
 
@@ -228,11 +232,14 @@ pref：`extensions.zotero.color-keys.keymap`，JSON 字符串：
 
 | 风险 | 概率 | 应对 |
 |---|---|---|
-| `Zotero.Notes.registerEditorInstance` 在 Zotero 10 不可用或签名不同 | 中 | 实施第 0 步 spike 验证；失败走 4.3 退路 |
+| `Zotero.Notes.registerEditorInstance` 在 Zotero 10 不可用或签名不同 | 低（spike 已通过） | 已实测可用；保留退路：轮询 `Zotero.Notes._editorInstances` + 监听 `note-editor` 挂载 |
+| chrome 侧对象传给 ProseMirror 被 Xray 拦（attrs 丢失） | 高（spike 已复现） | 所有 mark attrs 用 `new iframeWindow.Object()` 构造，统一封装在 `colorCommands` |
+| 颜色被 Zotero 规范化为 `rgb()`，与 hex 字符串不等 | 高 | 比较颜色前统一 normalize（hex ↔ `rgb()`），不直接字符串比较 |
 | ProseMirror 内部字段变化 | 中 | 调用封装 try/catch，失败降级为不拦截并记诊断 |
 | BN 同时 patch 同函数导致覆盖 | 低 | 链式包装，双方逻辑保留 |
 | AltGr 吞键（Windows 部分布局） | 中 | 录制器支持 `Ctrl+Shift+Alt` 备选；文档说明 |
 | 焦点在引用/链接弹层时误触发 | 中 | activeElement 检查 |
+| 同一笔记双实例（pane + tab）导致重复执行 | 高 | 按 itemID 去重，同一按键只处理一次 |
 | Zotero 升级破坏 iframe 结构 | 中 | 版本探测 + 诊断区提示 + 快速发补丁 |
 
 ## 11. 决策记录
@@ -250,7 +257,7 @@ pref：`extensions.zotero.color-keys.keymap`，JSON 字符串：
 
 ## 12. 实施顺序（阶段划分，供后续计划展开）
 
-1. 第 0 步：spike 验证编辑器挂载与 mark 写入（半天），结论写入独立文档 `docs/spike/2026-10-23-editor-hook.md`，并据此确认走 4.3 主路径或退路
+1. 第 0 步 spike：**已完成**，结论见 `docs/spike/2026-10-23-editor-hook.md`；主路径（hook + iframe view + transaction 写 mark）已验证，颜色写入并落盘
 2. 骨架：自写 bootstrap/manifest/prefs/面板静态 UI + 三语 FTL（不复制 AGPL 模板）
 3. 核心：keymap + editorRegistry + colorCommands
 4. 面板：录制器 + 冲突检测 + 诊断区

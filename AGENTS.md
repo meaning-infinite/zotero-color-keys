@@ -56,6 +56,8 @@ pnpm release
 6. 不提交 `node_modules/`、`.scaffold/`、`*.xpi` 等构建产物
 7. 每次发布更新 `CHANGELOG.md`
 8. 依赖新增需在 PR/提交说明中给理由；默认不引入新运行时依赖
+9. 跨 compartment 规则：传给编辑器 ProseMirror 的对象（mark attrs 等）必须在 iframe realm 内创建（`new iframeWindow.Object()`），chrome 侧 plain object 会被 Xray 拦；颜色比较统一 normalize（hex ↔ `rgb()`），不要直接字符串比较
+10. 编辑器实例按 `itemID` 去重：同一笔记存在 pane + tab 两个实例，一次按键只能处理一次
 
 ## 验收
 

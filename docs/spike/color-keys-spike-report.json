@@ -1,0 +1,267 @@
+{
+  "startedAt": "2026-10-23T13:12:11.087Z",
+  "zoteroVersion": "10.0.6",
+  "platform": "win",
+  "registerEditorInstance": {
+    "exists": true,
+    "length": 1,
+    "sourceHead": "function (instance) {\n    this._editorInstances.push(instance);\n  }"
+  },
+  "instances": [
+    {
+      "index": 0,
+      "hookedAt": "2026-10-23T13:12:12.637Z",
+      "retries": 1,
+      "instanceKeysAtHook": [
+        "_handleFontChange",
+        "_handleContentViewModeChange",
+        "_handleStyleChange",
+        "_handleSpellCheckChange",
+        "_messageHandler",
+        "instanceID",
+        "_undoRedoController",
+        "_lastSaveID"
+      ],
+      "afterInit": {
+        "at": "2026-10-23T13:12:13.143Z",
+        "instanceKeys": [
+          "_handleFontChange",
+          "_handleContentViewModeChange",
+          "_handleStyleChange",
+          "_handleSpellCheckChange",
+          "_messageHandler",
+          "instanceID",
+          "_undoRedoController",
+          "_lastSaveID",
+          "onNavigate",
+          "_item",
+          "_reloaded",
+          "_viewMode",
+          "_tabID",
+          "_readOnly",
+          "_filesReadOnly",
+          "_disableUI",
+          "_onReturn",
+          "_iframeWindow",
+          "_popup",
+          "_state",
+          "_disableSaving",
+          "_subscriptions",
+          "_citationDialogWindow",
+          "_citationItemsList",
+          "_resolveInitPromise",
+          "_rejectInitPromise",
+          "_initPromise",
+          "_prefObserverIDs",
+          "_spellChecker"
+        ],
+        "hasIframeWindow": true,
+        "hasWrappedJSObject": true,
+        "itemID": 1,
+        "viewMode": "library",
+        "tabID": null
+      },
+      "view": {
+        "found": true,
+        "path": "iframe._currentEditorInstance._editorCore.view",
+        "iframeKeys": [
+          "DataView",
+          "VisualViewport",
+          "SVGViewElement",
+          "visualViewport",
+          "zotero-editor",
+          "zoteroPrint",
+          "zoteroExecCommand",
+          "zoteroTranslateToMarkdown",
+          "zoteroCopyImage",
+          "zoteroSaveImageAs",
+          "_currentEditorInstance"
+        ],
+        "markNames": [
+          "strong",
+          "em",
+          "underline",
+          "strike",
+          "subsup",
+          "textColor",
+          "backgroundColor",
+          "link",
+          "code"
+        ],
+        "selectionEmpty": true,
+        "firstInspect": {
+          "docLength": 6,
+          "docText": "\"测试测试测试\"",
+          "nodeSamples": [
+            "paragraph",
+            "text",
+            "paragraph",
+            "text",
+            "paragraph",
+            "text",
+            "paragraph"
+          ],
+          "contentSize": 14
+        }
+      },
+      "lastAttempt": {
+        "phase": "immediate",
+        "at": "2026-10-23T13:12:13.144Z",
+        "docLength": 6,
+        "docText": "\"测试测试测试\"",
+        "nodeSamples": [
+          "paragraph",
+          "text",
+          "paragraph",
+          "text",
+          "paragraph",
+          "text",
+          "paragraph"
+        ],
+        "contentSize": 14
+      },
+      "applyMark": {
+        "ok": true,
+        "phase": "immediate",
+        "attrsMode": "iframe-realm",
+        "at": "2026-10-23T13:12:13.146Z",
+        "from": 0,
+        "to": 14
+      },
+      "persistence": {
+        "foundItem": true,
+        "itemId": 1,
+        "htmlTail": "<div data-schema-version=\"9\"><p><span style=\"color: rgb(255, 32, 32);\">测试</span></p>\n<p><span style=\"color: rgb(255, 32, 32);\">测试</span></p>\n<p><span style=\"color: rgb(255, 32, 32);\">测试</span></p>\n<p></p>\n</div>"
+      }
+    },
+    {
+      "index": 1,
+      "hookedAt": "2026-10-23T13:12:13.155Z",
+      "retries": 1,
+      "instanceKeysAtHook": [
+        "_handleFontChange",
+        "_handleContentViewModeChange",
+        "_handleStyleChange",
+        "_handleSpellCheckChange",
+        "_messageHandler",
+        "instanceID",
+        "_undoRedoController",
+        "_lastSaveID"
+      ],
+      "afterInit": {
+        "at": "2026-10-23T13:12:13.682Z",
+        "instanceKeys": [
+          "_handleFontChange",
+          "_handleContentViewModeChange",
+          "_handleStyleChange",
+          "_handleSpellCheckChange",
+          "_messageHandler",
+          "instanceID",
+          "_undoRedoController",
+          "_lastSaveID",
+          "onNavigate",
+          "_item",
+          "_reloaded",
+          "_viewMode",
+          "_tabID",
+          "_readOnly",
+          "_filesReadOnly",
+          "_disableUI",
+          "_onReturn",
+          "_iframeWindow",
+          "_popup",
+          "_state",
+          "_disableSaving",
+          "_subscriptions",
+          "_citationDialogWindow",
+          "_citationItemsList",
+          "_resolveInitPromise",
+          "_rejectInitPromise",
+          "_initPromise",
+          "_prefObserverIDs",
+          "_spellChecker"
+        ],
+        "hasIframeWindow": true,
+        "hasWrappedJSObject": true,
+        "itemID": 1,
+        "viewMode": "tab",
+        "tabID": "tab-B5Ddjc37"
+      },
+      "view": {
+        "found": true,
+        "path": "iframe._currentEditorInstance._editorCore.view",
+        "iframeKeys": [
+          "DataView",
+          "VisualViewport",
+          "SVGViewElement",
+          "visualViewport",
+          "zotero-editor",
+          "zoteroPrint",
+          "zoteroExecCommand",
+          "zoteroTranslateToMarkdown",
+          "zoteroCopyImage",
+          "zoteroSaveImageAs",
+          "_currentEditorInstance"
+        ],
+        "markNames": [
+          "strong",
+          "em",
+          "underline",
+          "strike",
+          "subsup",
+          "textColor",
+          "backgroundColor",
+          "link",
+          "code"
+        ],
+        "selectionEmpty": true,
+        "firstInspect": {
+          "docLength": 6,
+          "docText": "\"测试测试测试\"",
+          "nodeSamples": [
+            "paragraph",
+            "text",
+            "paragraph",
+            "text",
+            "paragraph",
+            "text",
+            "paragraph"
+          ],
+          "contentSize": 14
+        }
+      },
+      "lastAttempt": {
+        "phase": "immediate",
+        "at": "2026-10-23T13:12:13.683Z",
+        "docLength": 6,
+        "docText": "\"测试测试测试\"",
+        "nodeSamples": [
+          "paragraph",
+          "text",
+          "paragraph",
+          "text",
+          "paragraph",
+          "text",
+          "paragraph"
+        ],
+        "contentSize": 14
+      },
+      "applyMark": {
+        "ok": true,
+        "phase": "immediate",
+        "attrsMode": "iframe-realm",
+        "at": "2026-10-23T13:12:13.685Z",
+        "from": 0,
+        "to": 14
+      },
+      "persistence": {
+        "foundItem": true,
+        "itemId": 1,
+        "htmlTail": "<div data-schema-version=\"9\"><p><span style=\"color: rgb(255, 32, 32);\">测试</span></p>\n<p><span style=\"color: rgb(255, 32, 32);\">测试</span></p>\n<p><span style=\"color: rgb(255, 32, 32);\">测试</span></p>\n<p></p>\n</div>"
+      }
+    }
+  ],
+  "errors": [],
+  "hookInstalled": true,
+  "reportPath": "C:\\WINDOWS\\TEMP\\color-keys-spike.json"
+}
