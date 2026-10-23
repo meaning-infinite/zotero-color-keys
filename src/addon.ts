@@ -1,4 +1,4 @@
-import type { ZoteroToolkit } from "zotero-plugin-toolkit";
+import type { ZoteroToolkit } from "zotero-plugin-toolkit/ztoolkit";
 import { config } from "../package.json";
 import hooks from "./hooks";
 import { createZToolkit } from "./utils/ztoolkit";

@@ -25,6 +25,10 @@ export default defineConfig({
     prefs: {
       prefix: pkg.config.prefsPrefix,
     },
+    fluent: {
+      // Message IDs in this project already carry the addonRef prefix.
+      prefixFluentMessages: false,
+    },
     esbuildOptions: [
       {
         entryPoints: ["src/index.ts"],

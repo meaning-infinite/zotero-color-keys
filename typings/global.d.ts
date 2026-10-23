@@ -1,5 +1,5 @@
 import type Addon from "../src/addon";
-import type { ZoteroToolkit } from "zotero-plugin-toolkit";
+import type { ZoteroToolkit } from "zotero-plugin-toolkit/ztoolkit";
 
 declare global {
   const _globalThis: typeof globalThis & {
