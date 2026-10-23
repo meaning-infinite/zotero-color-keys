@@ -5,6 +5,10 @@
 export interface DiagnosticsState {
   attachedEditors: number;
   registeredEditors: number;
+  keydownSeen: number;
+  lastTrace: string | null;
+  lastCombo: string | null;
+  lastCommand: string | null;
   lastError: string | null;
   lastErrorAt: string | null;
   betterNotes: boolean;
@@ -15,6 +19,10 @@ export interface DiagnosticsState {
 export const diagnostics: DiagnosticsState = {
   attachedEditors: 0,
   registeredEditors: 0,
+  keydownSeen: 0,
+  lastTrace: null,
+  lastCombo: null,
+  lastCommand: null,
   lastError: null,
   lastErrorAt: null,
   betterNotes: false,
@@ -30,6 +38,9 @@ export function recordError(scope: string, error: unknown): void {
 export function resetDiagnostics(): void {
   diagnostics.attachedEditors = 0;
   diagnostics.registeredEditors = 0;
+  diagnostics.keydownSeen = 0;
+  diagnostics.lastCombo = null;
+  diagnostics.lastCommand = null;
   diagnostics.lastError = null;
   diagnostics.lastErrorAt = null;
   diagnostics.betterNotes = false;

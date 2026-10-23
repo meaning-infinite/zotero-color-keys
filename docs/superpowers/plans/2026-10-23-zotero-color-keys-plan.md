@@ -6,6 +6,9 @@
 
 ## 总览
 
+> 进度（2026-10-23）：阶段 0、1、2、3、4、5 已完成并提交；阶段 6 中单测/构建/README/CHANGELOG 完成，CI 待 GitHub `workflow` scope；阶段 7 未开始。
+> 端到端验证：`docs/testing/2026-10-23-e2e-shortcuts.md`（6 项功能断言全过）。真实键盘 preventDefault、中文输入法、面板改键生效需人工确认。
+
 8 个阶段，每阶段有明确 done 标准。阶段 0 是硬门禁：spike 不通过就改走规格 4.3 退路，不进入阶段 2。
 
 | 阶段 | 内容 | 预计 |

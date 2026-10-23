@@ -1,0 +1,190 @@
+{
+  "startedAt": "2026-10-23T13:35:00.469Z",
+  "zoteroVersion": "10.0.6",
+  "steps": [
+    {
+      "name": "baseline: clear all",
+      "prevented": false,
+      "at": "2026-10-23T13:35:04.273Z",
+      "htmlTail": "<div data-schema-version=\"9\"><p>测试</p>\n<p>测试</p>\n<p>测试</p>\n<p>测试</p>\n<p>测试</p>\n</div>",
+      "diagnostics": {
+        "attachedEditors": 1,
+        "registeredEditors": 1,
+        "keydownSeen": 1,
+        "lastTrace": "{\"key\":\"d\",\"code\":\"KeyD\",\"altKey\":true,\"ctrlKey\":true,\"targetTag\":\"BODY\",\"editableTarget\":false,\"readOnly\":false,\"markdown\":false,\"composing\":false}",
+        "lastCombo": "accel,alt,shift,d",
+        "lastCommand": "actions.clearAll",
+        "lastError": null,
+        "handles": [
+          {
+            "viewMode": "tab",
+            "itemID": 1
+          }
+        ],
+        "addonInstance": "object",
+        "editorInstances": [
+          {
+            "viewMode": "tab",
+            "itemID": 1
+          }
+        ]
+      },
+      "plainText": true
+    },
+    {
+      "name": "alt+r applies red text",
+      "prevented": false,
+      "at": "2026-10-23T13:35:05.637Z",
+      "htmlTail": "(255, 32, 32);\">测试</span></p>\n<p><span style=\"color: rgb(255, 32, 32);\">测试</span></p>\n<p><span style=\"color: rgb(255, 32, 32);\">测试</span></p>\n<p><span style=\"color: rgb(255, 32, 32);\">测试</span></p>\n<p><span style=\"color: rgb(255, 32, 32);\">测试</span></p>\n</div>",
+      "diagnostics": {
+        "attachedEditors": 1,
+        "registeredEditors": 1,
+        "keydownSeen": 2,
+        "lastTrace": "{\"key\":\"r\",\"code\":\"KeyR\",\"altKey\":true,\"ctrlKey\":false,\"targetTag\":\"BODY\",\"editableTarget\":false,\"readOnly\":false,\"markdown\":false,\"composing\":false}",
+        "lastCombo": "alt,r",
+        "lastCommand": "textColor.red",
+        "lastError": null,
+        "handles": [
+          {
+            "viewMode": "tab",
+            "itemID": 1
+          }
+        ],
+        "addonInstance": "object",
+        "editorInstances": [
+          {
+            "viewMode": "tab",
+            "itemID": 1
+          }
+        ]
+      },
+      "hasRed": true
+    },
+    {
+      "name": "alt+r again toggles red off",
+      "prevented": false,
+      "at": "2026-10-23T13:35:07.088Z",
+      "htmlTail": "<div data-schema-version=\"9\"><p>测试</p>\n<p>测试</p>\n<p>测试</p>\n<p>测试</p>\n<p>测试</p>\n</div>",
+      "diagnostics": {
+        "attachedEditors": 1,
+        "registeredEditors": 1,
+        "keydownSeen": 3,
+        "lastTrace": "{\"key\":\"r\",\"code\":\"KeyR\",\"altKey\":true,\"ctrlKey\":false,\"targetTag\":\"BODY\",\"editableTarget\":false,\"readOnly\":false,\"markdown\":false,\"composing\":false}",
+        "lastCombo": "alt,r",
+        "lastCommand": "textColor.red",
+        "lastError": null,
+        "handles": [
+          {
+            "viewMode": "tab",
+            "itemID": 1
+          }
+        ],
+        "addonInstance": "object",
+        "editorInstances": [
+          {
+            "viewMode": "tab",
+            "itemID": 1
+          }
+        ]
+      },
+      "hasRed": false
+    },
+    {
+      "name": "ctrl+alt+y applies yellow highlight",
+      "prevented": false,
+      "at": "2026-10-23T13:35:08.458Z",
+      "htmlTail": "(255, 212, 0, 0.5);\">测试</span></p>\n<p><span style=\"background-color: rgba(255, 212, 0, 0.5);\">测试</span></p>\n<p><span style=\"background-color: rgba(255, 212, 0, 0.5);\">测试</span></p>\n<p><span style=\"background-color: rgba(255, 212, 0, 0.5);\">测试</span></p>\n</div>",
+      "diagnostics": {
+        "attachedEditors": 1,
+        "registeredEditors": 1,
+        "keydownSeen": 4,
+        "lastTrace": "{\"key\":\"y\",\"code\":\"KeyY\",\"altKey\":true,\"ctrlKey\":true,\"targetTag\":\"BODY\",\"editableTarget\":false,\"readOnly\":false,\"markdown\":false,\"composing\":false}",
+        "lastCombo": "accel,alt,y",
+        "lastCommand": "backgroundColor.yellow",
+        "lastError": null,
+        "handles": [
+          {
+            "viewMode": "tab",
+            "itemID": 1
+          }
+        ],
+        "addonInstance": "object",
+        "editorInstances": [
+          {
+            "viewMode": "tab",
+            "itemID": 1
+          }
+        ]
+      },
+      "hasHighlight": true
+    },
+    {
+      "name": "ctrl+alt+d clears highlight",
+      "prevented": false,
+      "at": "2026-10-23T13:35:09.822Z",
+      "htmlTail": "<div data-schema-version=\"9\"><p>测试</p>\n<p>测试</p>\n<p>测试</p>\n<p>测试</p>\n<p>测试</p>\n</div>",
+      "diagnostics": {
+        "attachedEditors": 1,
+        "registeredEditors": 1,
+        "keydownSeen": 5,
+        "lastTrace": "{\"key\":\"d\",\"code\":\"KeyD\",\"altKey\":true,\"ctrlKey\":true,\"targetTag\":\"BODY\",\"editableTarget\":false,\"readOnly\":false,\"markdown\":false,\"composing\":false}",
+        "lastCombo": "accel,alt,d",
+        "lastCommand": "actions.clearHighlight",
+        "lastError": null,
+        "handles": [
+          {
+            "viewMode": "tab",
+            "itemID": 1
+          }
+        ],
+        "addonInstance": "object",
+        "editorInstances": [
+          {
+            "viewMode": "tab",
+            "itemID": 1
+          }
+        ]
+      },
+      "hasHighlight": false
+    },
+    {
+      "name": "alt+z passes through",
+      "prevented": false,
+      "at": "2026-10-23T13:35:10.435Z",
+      "htmlTail": "<div data-schema-version=\"9\"><p>测试</p>\n<p>测试</p>\n<p>测试</p>\n<p>测试</p>\n<p>测试</p>\n</div>",
+      "diagnostics": {
+        "attachedEditors": 1,
+        "registeredEditors": 1,
+        "keydownSeen": 6,
+        "lastTrace": "{\"key\":\"z\",\"code\":\"KeyZ\",\"altKey\":true,\"ctrlKey\":false,\"targetTag\":\"BODY\",\"editableTarget\":false,\"readOnly\":false,\"markdown\":false,\"composing\":false}",
+        "lastCombo": "alt,z",
+        "lastCommand": "actions.clearHighlight",
+        "lastError": null,
+        "handles": [
+          {
+            "viewMode": "tab",
+            "itemID": 1
+          }
+        ],
+        "addonInstance": "object",
+        "editorInstances": [
+          {
+            "viewMode": "tab",
+            "itemID": 1
+          }
+        ]
+      },
+      "htmlUnchanged": true
+    }
+  ],
+  "errors": [],
+  "summary": {
+    "clearAll": true,
+    "textApply": true,
+    "textToggle": true,
+    "highlightApply": true,
+    "clearHighlight": true,
+    "unboundPassthrough": true
+  },
+  "finishedAt": "2026-10-23T13:35:10.436Z"
+}

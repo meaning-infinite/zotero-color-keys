@@ -109,6 +109,18 @@ function isMarkdownMode(instance: Record<string, any>): boolean {
 function onKeyDown(handle: EditorHandle, event: any): void {
   try {
     if (!event || event.defaultPrevented) return;
+    diagnostics.keydownSeen += 1;
+    diagnostics.lastTrace = JSON.stringify({
+      key: String(event.key ?? ""),
+      code: String(event.code ?? ""),
+      altKey: !!event.altKey,
+      ctrlKey: !!event.ctrlKey,
+      targetTag: String(event.target?.tagName ?? ""),
+      editableTarget: isEditableTarget(event.target),
+      readOnly: !!handle.instance._readOnly,
+      markdown: isMarkdownMode(handle.instance),
+      composing: !!event.isComposing,
+    });
     if (event.isComposing) return;
     if (handle.instance._readOnly) return;
     if (isMarkdownMode(handle.instance)) return;
@@ -116,9 +128,11 @@ function onKeyDown(handle: EditorHandle, event: any): void {
 
     const combo = comboFromEvent(event, Zotero.isMac);
     if (!combo) return;
+    diagnostics.lastCombo = `${combo.mods.join(",")},${combo.key}`;
 
     const command = matchCommand(getKeymap(), combo);
     if (!command) return;
+    diagnostics.lastCommand = command;
 
     const handled = executeCommand(handle, command);
     if (handled) {

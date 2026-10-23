@@ -80,9 +80,11 @@ function rangeHasUniformMark(
   let seenText = false;
   let uniformSame = true;
   state.doc.nodesBetween(from, to, (node: any) => {
-    if (!node.isText) return true;
+    // node.isText 在 chrome 侧读 Xray 包装时不可靠，用 schema type name 兜底
+    const isTextNode = node?.isText === true || node?.type?.name === "text";
+    if (!isTextNode) return true;
     seenText = true;
-    const mark = node.marks?.find((item: any) => item.type?.name === markName);
+    const mark = node.marks?.find?.((item: any) => item.type?.name === markName);
     if (!mark || !colorsEqual(mark.attrs?.color, hex)) {
       uniformSame = false;
     }
