@@ -20,8 +20,12 @@ export function initLocale(): void {
     "Localization",
   ) as LocalizationConstructor;
 
+  // 面板文案在 preferences.ftl，运行期提示在 addon.ftl，一起加载
   addon.data.locale = {
-    current: new LocalizationCtor([`${config.addonRef}-addon.ftl`], true),
+    current: new LocalizationCtor(
+      [`${config.addonRef}-addon.ftl`, `${config.addonRef}-preferences.ftl`],
+      true,
+    ),
   };
 }
 

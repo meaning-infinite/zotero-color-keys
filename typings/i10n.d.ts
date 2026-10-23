@@ -3,7 +3,30 @@
 /* eslint-disable */
 // @ts-nocheck
 export type FluentMessageId =
+  | 'color-keys-action-clear-all'
+  | 'color-keys-action-clear-highlight'
+  | 'color-keys-action-clear-text'
+  | 'color-keys-altgr'
+  | 'color-keys-bn-no'
+  | 'color-keys-bn-yes'
+  | 'color-keys-color-blue'
+  | 'color-keys-color-gray'
+  | 'color-keys-color-green'
+  | 'color-keys-color-magenta'
+  | 'color-keys-color-orange'
+  | 'color-keys-color-purple'
+  | 'color-keys-color-red'
+  | 'color-keys-color-yellow'
+  | 'color-keys-conflict'
+  | 'color-keys-diagnostics'
+  | 'color-keys-help'
   | 'color-keys-name'
   | 'color-keys-prefs-heading'
-  | 'color-keys-prefs-placeholder'
-  | 'color-keys-prefs-title';
+  | 'color-keys-prefs-title'
+  | 'color-keys-recording'
+  | 'color-keys-reset'
+  | 'color-keys-reset-all'
+  | 'color-keys-section-actions'
+  | 'color-keys-section-highlight'
+  | 'color-keys-section-text'
+  | 'color-keys-unset';

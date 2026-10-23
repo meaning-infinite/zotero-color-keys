@@ -1,5 +1,18 @@
 import { config } from "../package.json";
+import {
+  installBetterNotesBridge,
+  uninstallBetterNotesBridge,
+} from "./modules/bnBridge";
+import { diagnostics } from "./modules/diagnostics";
+import {
+  installEditorHook,
+  uninstallEditorHook,
+} from "./modules/editorRegistry";
+import { observeKeymap, unobserveKeymap } from "./modules/keymapStore";
+import { initPrefsPane } from "./modules/prefsPane";
 import { getString, initLocale } from "./utils/locale";
+
+let keymapObserver: symbol | null = null;
 
 async function onStartup(): Promise<void> {
   await Promise.all([
@@ -20,6 +33,23 @@ async function onStartup(): Promise<void> {
     addon.data.ztoolkit.log("Failed to register preference pane", error);
   }
 
+  try {
+    installEditorHook();
+  } catch (error) {
+    addon.data.ztoolkit.log("Failed to install editor hook", error);
+  }
+
+  try {
+    installBetterNotesBridge();
+  } catch (error) {
+    addon.data.ztoolkit.log("Failed to install Better Notes bridge", error);
+  }
+
+  keymapObserver = observeKeymap(() => {
+    addon.data.ztoolkit.log("Keymap updated");
+  });
+
+  diagnostics.initializedAt = new Date().toISOString();
   addon.data.initialized = true;
   addon.data.ztoolkit.log("Plugin initialized");
 }
@@ -39,7 +69,7 @@ async function onPrefsEvent(
   switch (type) {
     case "load":
       addon.data.prefs = { window: data.window };
-      addon.data.ztoolkit.log("Preference pane loaded");
+      initPrefsPane(data.window);
       break;
     default:
       break;
@@ -47,6 +77,19 @@ async function onPrefsEvent(
 }
 
 async function onShutdown(): Promise<void> {
+  try {
+    uninstallBetterNotesBridge();
+  } catch {
+    /* ignore */
+  }
+  try {
+    uninstallEditorHook();
+  } catch {
+    /* ignore */
+  }
+  unobserveKeymap(keymapObserver);
+  keymapObserver = null;
+
   addon.data.ztoolkit.unregisterAll();
   addon.data.alive = false;
   addon.data.prefs = undefined;
