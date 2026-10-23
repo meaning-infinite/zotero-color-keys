@@ -21,32 +21,34 @@
 
 ## 阶段 0：环境、模板、spike
 
-### 0.1 安全前置（独立交付项）
+### 0.1 账号与工具（已完成）
 
-- 轮换 TRAE 里明文暴露的 GitHub PAT：撤销旧 token，生成细粒度 token（仅 `repo` 权限）
-- 把 token 存入 DSH MCP 配置或环境变量；不写入任何仓库
-- 验证：`git ls-remote` 能访问目标仓库（PAT 生效）
+- `gh` 便携版装在 `C:\Users\DYT\tools\gh\bin`，`gh auth login --web` 浏览器授权完成（账号 `meaning-infinite`，scope：`repo`、`read:org`、`gist`）
+- `gh auth setup-git` 已配置 git 凭据助手；不再使用任何 PAT
+- 待补：`gh auth refresh -h github.com -s workflow`（推送 `.github/workflows/` 需要 workflow scope），在阶段 6 加 CI 前执行
+- TRAE `mcp.json` 里的旧 PAT 由用户自行 revoke
 
-### 0.2 模板初始化
+### 0.2 骨架搭建（自写，非模板复制）
+
+`windingwind/zotero-plugin-template` 为 AGPL-3.0，复制会使插件变为 AGPL，与 MIT 目标冲突。因此只参考其结构，代码全部自写。
 
 ```bash
-git clone --depth 1 https://github.com/windingwind/zotero-plugin-template "$env:TEMP\zpt"
-# 复制模板内容（排除 .git）到项目根
 pnpm install
-pnpm start
+pnpm build
+pnpm start   # 本地装插件冒烟
 ```
 
-需要改的元数据：
-
-| 文件 | 改动 |
+| 文件 | 内容 |
 |---|---|
-| `package.json` | name `zotero-color-keys`、version `0.0.1`、description、author |
-| `addon/manifest.json` | id `color-keys@meaning-infinite`、name、`update_url`、`strict_min_version` 8.0、`strict_max_version` 10.* |
-| `zotero-plugin.config.ts` | `addonName` / `addonID` / `prefsPrefix: "extensions.zotero.color-keys"` / `updateURL` |
-| `addon/prefs.js` | 规格 5.4 的完整 keymap JSON 默认值 + `debug: false` |
-| `addon/locale/{zh-CN,en-US,zh-TW}/` | 建目录，先放 manifest 名与面板标题 |
+| `package.json` | name `zotero-color-keys`、version `0.0.1`、`config.addonName/addonID/addonRef/addonInstance/prefsPrefix` |
+| `addon/manifest.json` | 占位符由 scaffold 注入；id `color-keys@meaning-infinite`、min 8.0、max 10.* |
+| `zotero-plugin.config.ts` | scaffold 配置、`updateURL`、esbuild 入口 |
+| `addon/bootstrap.js` | 自写 Zotero bootstrap：注册 chrome、加载脚本、转发 hooks |
+| `addon/prefs.js` | 规格 5.4 的 keymap JSON 默认值 + `enable` + `debug` |
+| `addon/locale/{zh-CN,en-US,zh-TW}/` | 最小 FTL（插件名、面板标题、占位文案） |
+| `src/**` | index/addon/hooks/utils 最小实现，`addon.data.initialized` 供 scaffold 测试探测 |
 
-done：Zotero 启动后插件出现在扩展列表，无 console 报错，`pnpm build` 出 xpi。
+done：`pnpm build` 产出 `.scaffold/build/*.xpi`；`pnpm typecheck` 无错。
 
 ### 0.3 spike（硬门禁）
 

@@ -49,7 +49,7 @@ Better Notes for Zotero（下称 BN）在笔记编辑中缺少颜色/高亮快�
 
 ### 4.1 技术栈
 
-`zotero-plugin-template`（TypeScript + esbuild + `zotero-plugin-scaffold` + `zotero-plugin-toolkit` + `zotero-types`）。构建产物 `.xpi`、`update.json` 由 scaffold 生成。
+TypeScript + esbuild（由 `zotero-plugin-scaffold` 驱动）+ `zotero-plugin-toolkit`（MIT）+ `zotero-types`（MIT）。骨架自写，**不复制 `windingwind/zotero-plugin-template` 的文件**：该模板为 AGPL-3.0，复制会改变本项目许可证。`zotero-plugin-scaffold` 仅作为 devDependency 构建工具，不进入 `.xpi` 产物；最终发布物包含的代码仍为 MIT。构建产物 `.xpi`、`update.json` 由 scaffold 生成。
 
 ### 4.2 模块
 
@@ -246,11 +246,12 @@ pref：`extensions.zotero.color-keys.keymap`，JSON 字符串：
 | 段落语义 | 无选区时 `blockRange` | 与"当前段落"直觉一致，实现成本低 |
 | 版本切分 | v1.0 笔记侧，v1.1 PDF | 控制回归面，先上架 |
 | 许可证 | MIT | 允许社区复用；与 AGPL 的 BN 保持接口隔离 |
+| 骨架来源 | 自写骨架 + scaffold 构建工具 | 官方模板是 AGPL-3.0，复制会传染许可证；自写可保持 MIT，产物不含构建工具代码 |
 
 ## 12. 实施顺序（阶段划分，供后续计划展开）
 
 1. 第 0 步：spike 验证编辑器挂载与 mark 写入（半天），结论写入独立文档 `docs/spike/2026-10-23-editor-hook.md`，并据此确认走 4.3 主路径或退路
-2. 骨架：模板初始化、多语言、prefs 默认值、面板静态 UI
+2. 骨架：自写 bootstrap/manifest/prefs/面板静态 UI + 三语 FTL（不复制 AGPL 模板）
 3. 核心：keymap + editorRegistry + colorCommands
 4. 面板：录制器 + 冲突检测 + 诊断区
 5. BN 增强：Magic Key 命令注册

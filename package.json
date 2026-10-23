@@ -1,0 +1,36 @@
+{
+  "name": "zotero-color-keys",
+  "type": "module",
+  "version": "0.0.1",
+  "description": "Customizable keyboard shortcuts for text color and highlight color in Zotero notes",
+  "config": {
+    "addonName": "Zotero Color Keys",
+    "addonID": "color-keys@meaning-infinite",
+    "addonRef": "color-keys",
+    "addonInstance": "ColorKeys",
+    "prefsPrefix": "extensions.zotero.color-keys"
+  },
+  "author": "meaning-infinite",
+  "license": "MIT",
+  "homepage": "https://github.com/meaning-infinite/zotero-color-keys#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/meaning-infinite/zotero-color-keys.git"
+  },
+  "scripts": {
+    "start": "zotero-plugin serve",
+    "build": "zotero-plugin build && tsc --noEmit",
+    "release": "zotero-plugin release",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "zotero-plugin-toolkit": "^6.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.0",
+    "typescript": "^5.9.3",
+    "vitest": "^5.0.5",
+    "zotero-plugin-scaffold": "^0.9.3",
+    "zotero-types": "4.0.5"
+  }
+}
