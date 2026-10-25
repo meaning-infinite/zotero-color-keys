@@ -20,6 +20,7 @@ import {
   resetKeymapToDefaults,
   saveKeymap,
 } from "./keymapStore";
+import { getPref, setPref } from "../utils/prefs";
 
 const HTML_NS = "http://www.w3.org/1999/xhtml";
 
@@ -190,6 +191,69 @@ function renderPane(win: any): void {
     } else {
       status.textContent = "";
     }
+  }
+
+  // PDF 阅读器选项
+  const pdfOptions = doc.getElementById(prefixed("pdf-options"));
+  if (pdfOptions) {
+    while (pdfOptions.firstChild) pdfOptions.removeChild(pdfOptions.firstChild);
+
+    const addCheckbox = (
+      labelKey: string,
+      prefKey: "pdfTabRefocus" | "pdfShowToolbarColors",
+    ): void => {
+      const row = createEl(doc, "div", "color-keys-pdf-row");
+      row.style.display = "flex";
+      row.style.alignItems = "center";
+      row.style.gap = "6px";
+      row.style.margin = "3px 0";
+
+      const checkbox = createEl(doc, "input") as HTMLInputElement;
+      checkbox.type = "checkbox";
+      checkbox.checked = getPref(prefKey) !== false;
+      checkbox.addEventListener("change", () => {
+        setPref(prefKey, checkbox.checked);
+      });
+
+      const label = createEl(doc, "span", "color-keys-label");
+      label.textContent = getString(labelKey);
+
+      row.appendChild(checkbox);
+      row.appendChild(label);
+      pdfOptions.appendChild(row);
+    };
+
+    addCheckbox("pdf-tab-refocus", "pdfTabRefocus");
+    addCheckbox("pdf-toolbar-colors", "pdfShowToolbarColors");
+
+    const selectRow = createEl(doc, "div", "color-keys-pdf-row");
+    selectRow.style.display = "flex";
+    selectRow.style.alignItems = "center";
+    selectRow.style.gap = "6px";
+    selectRow.style.margin = "3px 0";
+
+    const selectLabel = createEl(doc, "span", "color-keys-label");
+    selectLabel.textContent = getString("pdf-click-action");
+    selectLabel.style.minWidth = "170px";
+
+    const select = createEl(doc, "select") as HTMLSelectElement;
+    for (const [value, labelKey] of [
+      ["apply", "pdf-click-apply"],
+      ["set-tool", "pdf-click-set-tool"],
+    ] as const) {
+      const option = createEl(doc, "option") as HTMLOptionElement;
+      option.value = value;
+      option.textContent = getString(labelKey);
+      if (String(getPref("pdfColorClickAction")) === value) option.selected = true;
+      select.appendChild(option);
+    }
+    select.addEventListener("change", () => {
+      setPref("pdfColorClickAction", select.value);
+    });
+
+    selectRow.appendChild(selectLabel);
+    selectRow.appendChild(select);
+    pdfOptions.appendChild(selectRow);
   }
 
   // 诊断信息

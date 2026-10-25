@@ -2,6 +2,24 @@
 
 All notable changes to this project are documented in this file.
 
+## [0.2.0-beta.2] - 2026-10-25
+
+### Added
+
+- PDF reader: `Alt+letter` now colors underlines, `Shift+Alt+letter` colors sticky notes (when a note annotation is selected)
+- PDF reader toolbar: 8 color swatches appended to the toolbar, click behavior configurable
+- Settings: Tab jumps from the sidebar annotation box back to the reader (so color shortcuts work); toolbar swatches toggle; click action (`apply` vs `set-tool`)
+- Diagnostics line now includes PDF reader count and last error
+
+### Fixed
+
+- PDF shortcuts now listen on the PDF.js view iframe as well, so keys work while focus is in the PDF body
+- Selecting over an existing highlight recolors it instead of stacking a new annotation
+
+### Notes
+
+- Still beta: needs real-PDF verification before 0.2.0
+
 ## [0.2.0-beta.1] - 2026-10-25
 
 ### Added

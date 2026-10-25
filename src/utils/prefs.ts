@@ -1,6 +1,12 @@
 import { config } from "../../package.json";
 
-type PrefKey = "enable" | "debug" | "keymap";
+type PrefKey =
+  | "enable"
+  | "debug"
+  | "keymap"
+  | "pdfTabRefocus"
+  | "pdfShowToolbarColors"
+  | "pdfColorClickAction";
 type PrefValue = string | number | boolean;
 
 const PREFIX = config.prefsPrefix;
@@ -10,7 +16,7 @@ function fullKey(key: PrefKey): string {
 }
 
 export function getPref<T = PrefValue>(key: PrefKey): T {
-  return Zotero.Prefs.get(fullKey(key), true) as T;
+  return Zotero.Prefs.get(fullKey(key), true) as unknown as T;
 }
 
 export function setPref(key: PrefKey, value: PrefValue): void {

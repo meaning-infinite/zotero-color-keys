@@ -21,6 +21,11 @@ export type FluentMessageId =
   | 'color-keys-diagnostics'
   | 'color-keys-help'
   | 'color-keys-name'
+  | 'color-keys-pdf-click-action'
+  | 'color-keys-pdf-click-apply'
+  | 'color-keys-pdf-click-set-tool'
+  | 'color-keys-pdf-tab-refocus'
+  | 'color-keys-pdf-toolbar-colors'
   | 'color-keys-prefs-heading'
   | 'color-keys-prefs-title'
   | 'color-keys-recording'
@@ -28,5 +33,6 @@ export type FluentMessageId =
   | 'color-keys-reset-all'
   | 'color-keys-section-actions'
   | 'color-keys-section-highlight'
+  | 'color-keys-section-pdf'
   | 'color-keys-section-text'
   | 'color-keys-unset';

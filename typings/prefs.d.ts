@@ -10,6 +10,9 @@ declare namespace _ZoteroTypes {
       "enable": boolean;
       "debug": boolean;
       "keymap": string;
+      "pdfTabRefocus": boolean;
+      "pdfShowToolbarColors": boolean;
+      "pdfColorClickAction": string;
     };
   }
 }
