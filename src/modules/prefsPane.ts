@@ -204,7 +204,11 @@ function renderPane(win: any): void {
         bn,
       },
     });
+    const extra: string[] = [`PDF: ${diagnostics.pdfReaders}`];
+    if (diagnostics.lastError) extra.push(diagnostics.lastError);
+    diagnosticsEl.textContent += `\n${extra.join(" | ")}`;
     (diagnosticsEl as any).style.opacity = "0.75";
+    (diagnosticsEl as any).style.whiteSpace = "pre-wrap";
   }
 
   if (resetAll && !resetAllBound) {
