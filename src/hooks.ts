@@ -9,6 +9,7 @@ import {
   uninstallEditorHook,
 } from "./modules/editorRegistry";
 import { observeKeymap, unobserveKeymap } from "./modules/keymapStore";
+import { installPdfBridge, uninstallPdfBridge } from "./modules/pdfBridge";
 import { initPrefsPane } from "./modules/prefsPane";
 import { getString, initLocale } from "./utils/locale";
 
@@ -45,6 +46,12 @@ async function onStartup(): Promise<void> {
     addon.data.ztoolkit.log("Failed to install Better Notes bridge", error);
   }
 
+  try {
+    installPdfBridge();
+  } catch (error) {
+    addon.data.ztoolkit.log("Failed to install PDF bridge", error);
+  }
+
   keymapObserver = observeKeymap(() => {
     addon.data.ztoolkit.log("Keymap updated");
   });
@@ -77,6 +84,11 @@ async function onPrefsEvent(
 }
 
 async function onShutdown(): Promise<void> {
+  try {
+    uninstallPdfBridge();
+  } catch {
+    /* ignore */
+  }
   try {
     uninstallBetterNotesBridge();
   } catch {

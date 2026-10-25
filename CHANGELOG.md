@@ -2,6 +2,18 @@
 
 All notable changes to this project are documented in this file.
 
+## [0.2.0-beta.1] - 2026-10-25
+
+### Added
+
+- PDF reader: highlight shortcuts (`Ctrl+Alt+color`) now create a highlight for the current text selection, or recolor the selected annotation
+- `diagnostics.pdfBridge` / `pdfReaders` counters for troubleshooting PDF integration
+
+### Notes
+
+- Requires user testing on real PDFs before promoting to 0.2.0
+- Reader toolbar redesign (second UX scheme) still pending
+
 ## [0.1.1] - 2026-10-25
 
 ### Added
