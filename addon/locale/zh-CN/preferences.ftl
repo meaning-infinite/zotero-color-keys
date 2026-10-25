@@ -1,5 +1,5 @@
 color-keys-prefs-heading = 色彩快捷键
-color-keys-help = 笔记：Alt+字母 改文字颜色，Ctrl+Alt+字母 改高亮；同色再按取消，无选区作用于当前段落。PDF：Alt+字母 下划线、Ctrl+Alt+字母 高亮，选中已标注文本会连同类型一起切换；Alt+D / Ctrl+Alt+D / Ctrl+Alt+Shift+D 分别清除下划线 / 高亮 / 全部。选中文本弹窗里默认点色=下划线，按住 Ctrl 点色=高亮。
+color-keys-help = 为 Zotero 笔记与 PDF 阅读器提供可自定义的颜色快捷键。
 color-keys-section-keys = 颜色与快捷键
 color-keys-column-color = 颜色
 color-keys-column-text = 文字颜色

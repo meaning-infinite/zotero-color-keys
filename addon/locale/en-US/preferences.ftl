@@ -1,5 +1,5 @@
 color-keys-prefs-heading = Color Keys
-color-keys-help = Notes: Alt+letter sets text color, Ctrl+Alt+letter sets highlight; press the same color again to remove it, with no selection it applies to the current paragraph. PDF: Alt+letter underlines, Ctrl+Alt+letter highlights, and an already-annotated selection switches type as well; Alt+D / Ctrl+Alt+D / Ctrl+Alt+Shift+D clear underline / highlight / both. In the selection popup, click a color for underline, hold Ctrl for highlight.
+color-keys-help = Customizable color shortcuts for Zotero notes and the PDF reader.
 color-keys-section-keys = Colors & shortcuts
 color-keys-column-color = Color
 color-keys-column-text = Text color

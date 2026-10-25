@@ -87,7 +87,7 @@ function applyColor(reader: any, type: PdfAnnotationType, colorName: string): bo
     const view = reader._lastView;
     if (!view) return false;
 
-    // 1) 已点选的批注：类型不一致时先转换类型，再改色
+    // 1) 已点选的批注：类型 + 颜色一次更新（原子操作，避免被后续刷新覆盖）
     const selected = state.selectedAnnotationIDs || [];
     const selectedTargets = [];
     for (const id of selected) {
@@ -95,28 +95,16 @@ function applyColor(reader: any, type: PdfAnnotationType, colorName: string): bo
       if (annotation && !annotation.readOnly) selectedTargets.push(annotation);
     }
     if (selectedTargets.length) {
-      const ids = selectedTargets.map((a) => a.id);
-      const needConvert = selectedTargets.filter(
-        (a) => a.type !== type && (a.type === "highlight" || a.type === "underline"),
-      );
-      for (const annotation of needConvert) {
-        // 逐个转换，单个失败不影响其它批注
-        try {
-          reader.convertAnnotations([annotation.id], type);
-        } catch (e) {
-          /* ignore */
-        }
-      }
-      const applyColors = () => {
-        try {
-          manager.updateAnnotations(ids.map((id) => ({ id, color: hex })));
-        } catch (e) {
-          /* ignore */
-        }
-      };
-      // 转换会触发自己的状态更新，颜色更新延后一拍，避免被覆盖
-      if (needConvert.length) setTimeout(applyColors, 60);
-      else applyColors();
+      const updates: Array<{ id: string; color: string; type?: string }> =
+        selectedTargets.map((a) => {
+          const update: { id: string; color: string; type?: string } = {
+            id: a.id,
+            color: hex,
+          };
+          if (a.type === "highlight" || a.type === "underline") update.type = type;
+          return update;
+        });
+      manager.updateAnnotations(updates);
       if (view._onSetSelectionPopup) view._onSetSelectionPopup();
       return true;
     }
@@ -301,22 +289,40 @@ function clearPdfAnnotations(reader: any, mode: "text" | "highlight" | "all"): b
 
     const ids = new Set();
     const selected = state.selectedAnnotationIDs || [];
-    for (const id of selected) {
-      const annotation = annotations.find((x) => x.id === id);
-      if (annotation && !annotation.readOnly && types.includes(annotation.type)) ids.add(annotation.id);
-    }
 
-    if (!ids.size) {
+    // 收集参考区域：优先用选中批注的位置（这样一次能清掉同位置的其它层），其次用文本选区
+    const areas = [];
+    if (selected.length) {
+      for (const id of selected) {
+        const annotation = annotations.find((x) => x.id === id);
+        if (annotation?.position?.rects) {
+          areas.push({
+            pageIndex: annotation.position.pageIndex,
+            rects: annotation.position.rects,
+          });
+        }
+      }
+    }
+    if (!areas.length) {
       const pos = typeof view.getSelectionPosition === "function" ? view.getSelectionPosition() : null;
       if (pos && pos.rects && pos.rects.length) {
-        const hit = (a, b) => a[0] < b[2] && b[0] < a[2] && a[1] < b[3] && b[1] < a[3];
-        for (const annotation of annotations) {
-          if (!annotation || annotation.readOnly) continue;
-          if (!types.includes(annotation.type)) continue;
-          if (!annotation.position || annotation.position.pageIndex !== pos.pageIndex) continue;
-          const rects = annotation.position.rects || [];
-          if (rects.some((r) => pos.rects.some((s) => hit(r, s)))) ids.add(annotation.id);
-        }
+        areas.push({ pageIndex: pos.pageIndex, rects: pos.rects });
+      }
+    }
+
+    const hit = (a, b) => a[0] < b[2] && b[0] < a[2] && a[1] < b[3] && b[1] < a[3];
+    for (const annotation of annotations) {
+      if (!annotation || annotation.readOnly) continue;
+      if (!types.includes(annotation.type)) continue;
+      if (!annotation.position || !annotation.position.rects) continue;
+      if (
+        areas.some(
+          (area) =>
+            area.pageIndex === annotation.position.pageIndex &&
+            annotation.position.rects.some((r) => area.rects.some((s) => hit(r, s))),
+        )
+      ) {
+        ids.add(annotation.id);
       }
     }
 

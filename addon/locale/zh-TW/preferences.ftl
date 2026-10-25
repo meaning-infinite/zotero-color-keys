@@ -1,5 +1,5 @@
 color-keys-prefs-heading = 色彩快捷鍵
-color-keys-help = 筆記：Alt+字母 改文字顏色，Ctrl+Alt+字母 改螢光標記；同色再按取消，沒有選取時作用於目前段落。PDF：Alt+字母 底線、Ctrl+Alt+字母 螢光標記，選取已標註文字會連同類型一起切換；Alt+D / Ctrl+Alt+D / Ctrl+Alt+Shift+D 分別清除底線 / 螢光標記 / 全部。選取文字彈窗中預設點色=底線，按住 Ctrl 點色=螢光標記。
+color-keys-help = 為 Zotero 筆記與 PDF 閱讀器提供可自訂的顏色快捷鍵。
 color-keys-section-keys = 顏色與快捷鍵
 color-keys-column-color = 顏色
 color-keys-column-text = 文字顏色

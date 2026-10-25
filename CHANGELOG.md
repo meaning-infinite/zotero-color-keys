@@ -2,6 +2,17 @@
 
 All notable changes to this project are documented in this file.
 
+## [0.2.0-beta.7] - 2026-10-26
+
+### Fixed
+
+- Selected-annotation shortcuts now update type and color in a single `updateAnnotations` call (no conversion step, no delayed second write), fixing the "type changes but color does not" and the frozen-shortcuts state
+- PDF clear actions collect every annotation of the target type under the selection or selected annotation, so overlapping layers are removed in one press
+
+### Changed
+
+- Settings intro reduced to one sentence covering both notes and the PDF reader
+
 ## [0.2.0-beta.6] - 2026-10-26
 
 ### Added
