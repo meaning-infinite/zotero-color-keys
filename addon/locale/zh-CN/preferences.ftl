@@ -1,6 +1,5 @@
 color-keys-prefs-heading = 色彩快捷键
-color-keys-help = 笔记中：Alt+字母 改文字颜色，Ctrl+Alt+字母 改高亮；同色再按取消，无选区时作用于当前段落。
-color-keys-note-help = 笔记编辑器里选中文字后按快捷键即可上色，再按同色取消；没有选中时作用于当前段落。
+color-keys-help = 笔记：Alt+字母 改文字颜色，Ctrl+Alt+字母 改高亮；同色再按取消，无选区作用于当前段落。PDF：Alt+字母 下划线、Ctrl+Alt+字母 高亮，选中已标注文本会连同类型一起切换；Alt+D / Ctrl+Alt+D / Ctrl+Alt+Shift+D 分别清除下划线 / 高亮 / 全部。选中文本弹窗里默认点色=下划线，按住 Ctrl 点色=高亮。
 color-keys-section-keys = 颜色与快捷键
 color-keys-column-color = 颜色
 color-keys-column-text = 文字颜色
@@ -8,8 +7,7 @@ color-keys-column-highlight = 高亮
 color-keys-column-action = 动作
 color-keys-column-key = 快捷键
 color-keys-section-actions = 清除
-color-keys-section-pdf = PDF 阅读器
-color-keys-pdf-help = PDF 中：Alt+字母 改下划线颜色（若选中的是高亮会转成下划线），Ctrl+Alt+字母 改高亮颜色（反之亦然）。选中文本弹窗里默认点色=下划线，按住 Ctrl 点色=高亮；快捷键在侧栏注释输入框聚焦时同样生效。
+
 color-keys-color-red = 红
 color-keys-color-orange = 橙
 color-keys-color-yellow = 黄

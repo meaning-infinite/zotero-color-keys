@@ -83,10 +83,9 @@ function renderPane(win: any): void {
   const status = doc.getElementById(prefixed("status"));
   const diagnosticsEl = doc.getElementById(prefixed("diagnostics"));
   const resetAll = doc.getElementById(prefixed("reset-all"));
-  const pdfOptions = doc.getElementById(prefixed("pdf-options"));
   if (!grid || !actionRows) return;
 
-  for (const container of [grid, actionRows, pdfOptions]) {
+  for (const container of [grid, actionRows]) {
     while (container && container.firstChild) {
       container.removeChild(container.firstChild);
     }
@@ -237,17 +236,6 @@ function renderPane(win: any): void {
     } else {
       status.textContent = "";
     }
-  }
-
-  // PDF 阅读器说明
-  if (pdfOptions) {
-    const help = createEl(doc, "div", "color-keys-pdf-help");
-    help.textContent = getString("pdf-help");
-    help.style.opacity = "0.8";
-    help.style.maxWidth = "700px";
-    help.style.whiteSpace = "normal";
-    help.style.lineHeight = "1.5";
-    pdfOptions.appendChild(help);
   }
 
   // 诊断信息

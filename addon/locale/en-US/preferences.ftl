@@ -1,6 +1,5 @@
 color-keys-prefs-heading = Color Keys
-color-keys-help = In notes: Alt+letter sets text color, Ctrl+Alt+letter sets highlight. Press the same color again to remove it; with no selection it applies to the current paragraph.
-color-keys-note-help = In the note editor, select text and press a shortcut to color it; press the same color again to remove it. With no selection it applies to the current paragraph.
+color-keys-help = Notes: Alt+letter sets text color, Ctrl+Alt+letter sets highlight; press the same color again to remove it, with no selection it applies to the current paragraph. PDF: Alt+letter underlines, Ctrl+Alt+letter highlights, and an already-annotated selection switches type as well; Alt+D / Ctrl+Alt+D / Ctrl+Alt+Shift+D clear underline / highlight / both. In the selection popup, click a color for underline, hold Ctrl for highlight.
 color-keys-section-keys = Colors & shortcuts
 color-keys-column-color = Color
 color-keys-column-text = Text color
@@ -8,8 +7,7 @@ color-keys-column-highlight = Highlight
 color-keys-column-action = Action
 color-keys-column-key = Shortcut
 color-keys-section-actions = Clear
-color-keys-section-pdf = PDF reader
-color-keys-pdf-help = In PDFs: Alt+letter recolors underlines (converting a selected highlight to underline), Ctrl+Alt+letter recolors highlights (and vice versa). In the selection popup, clicking a color applies underline; hold Ctrl while clicking for highlight. Shortcuts also work while the sidebar annotation box has focus.
+
 color-keys-color-red = Red
 color-keys-color-orange = Orange
 color-keys-color-yellow = Yellow

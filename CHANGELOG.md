@@ -2,6 +2,21 @@
 
 All notable changes to this project are documented in this file.
 
+## [0.2.0-beta.6] - 2026-10-26
+
+### Added
+
+- PDF clear actions: `Alt+D` deletes underlines, `Ctrl+Alt+D` deletes highlights, `Ctrl+Alt+Shift+D` deletes both (on selected annotations or annotations intersecting the selection)
+
+### Fixed
+
+- Annotation type conversion no longer swallows the color update: conversion is done per annotation and the color update is deferred one tick
+- Clear shortcuts now also work in the PDF reader
+
+### Changed
+
+- Settings: removed the separate "PDF reader" section; notes + PDF usage hints merged into the single intro paragraph at the top
+
 ## [0.2.0-beta.5] - 2026-10-26
 
 ### Fixed

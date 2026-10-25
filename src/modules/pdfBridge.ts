@@ -95,11 +95,28 @@ function applyColor(reader: any, type: PdfAnnotationType, colorName: string): bo
       if (annotation && !annotation.readOnly) selectedTargets.push(annotation);
     }
     if (selectedTargets.length) {
-      const needConvert = selectedTargets.filter((a) => a.type !== type && (a.type === "highlight" || a.type === "underline"));
-      if (needConvert.length && typeof reader.convertAnnotations === "function") {
-        reader.convertAnnotations(needConvert.map((a) => a.id), type);
+      const ids = selectedTargets.map((a) => a.id);
+      const needConvert = selectedTargets.filter(
+        (a) => a.type !== type && (a.type === "highlight" || a.type === "underline"),
+      );
+      for (const annotation of needConvert) {
+        // 逐个转换，单个失败不影响其它批注
+        try {
+          reader.convertAnnotations([annotation.id], type);
+        } catch (e) {
+          /* ignore */
+        }
       }
-      manager.updateAnnotations(selectedTargets.map((a) => ({ id: a.id, color: hex })));
+      const applyColors = () => {
+        try {
+          manager.updateAnnotations(ids.map((id) => ({ id, color: hex })));
+        } catch (e) {
+          /* ignore */
+        }
+      };
+      // 转换会触发自己的状态更新，颜色更新延后一拍，避免被覆盖
+      if (needConvert.length) setTimeout(applyColors, 60);
+      else applyColors();
       if (view._onSetSelectionPopup) view._onSetSelectionPopup();
       return true;
     }
@@ -263,6 +280,59 @@ function installSelectionPopup(reader: any, doc: any): void {
 }
 
 // ---------------------------------------------------------------------------
+// 清除（PDF 里"清除格式"= 删除对应类型的批注）
+// ---------------------------------------------------------------------------
+
+function clearPdfAnnotations(reader: any, mode: "text" | "highlight" | "all"): boolean {
+  return execInReader(
+    reader,
+    `
+    const reader = window._reader;
+    if (!reader) return false;
+    const state = reader._state;
+    if (!state || state.readOnly) return false;
+    const manager = reader._annotationManager;
+    if (!manager || manager._readOnly) return false;
+    const mode = ${JSON.stringify(mode)};
+    const types = mode === "all" ? ["highlight", "underline"] : [mode === "text" ? "underline" : "highlight"];
+    const annotations = (state.annotations && state.annotations.length ? state.annotations : manager._annotations) || [];
+    const view = reader._lastView;
+    if (!view) return false;
+
+    const ids = new Set();
+    const selected = state.selectedAnnotationIDs || [];
+    for (const id of selected) {
+      const annotation = annotations.find((x) => x.id === id);
+      if (annotation && !annotation.readOnly && types.includes(annotation.type)) ids.add(annotation.id);
+    }
+
+    if (!ids.size) {
+      const pos = typeof view.getSelectionPosition === "function" ? view.getSelectionPosition() : null;
+      if (pos && pos.rects && pos.rects.length) {
+        const hit = (a, b) => a[0] < b[2] && b[0] < a[2] && a[1] < b[3] && b[1] < a[3];
+        for (const annotation of annotations) {
+          if (!annotation || annotation.readOnly) continue;
+          if (!types.includes(annotation.type)) continue;
+          if (!annotation.position || annotation.position.pageIndex !== pos.pageIndex) continue;
+          const rects = annotation.position.rects || [];
+          if (rects.some((r) => pos.rects.some((s) => hit(r, s)))) ids.add(annotation.id);
+        }
+      }
+    }
+
+    if (!ids.size) return false;
+    try {
+      manager.deleteAnnotations([...ids]);
+    } catch (e) {
+      return false;
+    }
+    if (view._onSetSelectionPopup) view._onSetSelectionPopup();
+    return true;
+    `,
+  );
+}
+
+// ---------------------------------------------------------------------------
 // 键盘
 // ---------------------------------------------------------------------------
 
@@ -284,12 +354,26 @@ function onReaderKeyDown(reader: any, event: any): void {
       return;
     }
 
-    // 兼容：键位表被改成非常规组合时，仍按高亮命令处理
     const combo = comboFromEvent(event, Zotero.isMac);
     if (!combo) return;
     const command = matchCommand(keymap, combo);
-    if (!command || !command.startsWith("backgroundColor.")) return;
-    if (applyColor(reader, "highlight", command.slice("backgroundColor.".length))) {
+    if (!command) return;
+
+    if (command.startsWith("backgroundColor.")) {
+      if (applyColor(reader, "highlight", command.slice("backgroundColor.".length))) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      return;
+    }
+
+    // 清除动作：Alt+D 删下划线，Ctrl+Alt+D 删高亮，Ctrl+Alt+Shift+D 删两者
+    let mode: "text" | "highlight" | "all" | null = null;
+    if (command === "actions.clearTextColor") mode = "text";
+    else if (command === "actions.clearHighlight") mode = "highlight";
+    else if (command === "actions.clearAll") mode = "all";
+    if (!mode) return;
+    if (clearPdfAnnotations(reader, mode)) {
       event.preventDefault();
       event.stopPropagation();
     }

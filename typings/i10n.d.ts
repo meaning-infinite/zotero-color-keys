@@ -26,8 +26,6 @@ export type FluentMessageId =
   | 'color-keys-diagnostics'
   | 'color-keys-help'
   | 'color-keys-name'
-  | 'color-keys-note-help'
-  | 'color-keys-pdf-help'
   | 'color-keys-prefs-heading'
   | 'color-keys-prefs-title'
   | 'color-keys-recording'
@@ -35,5 +33,4 @@ export type FluentMessageId =
   | 'color-keys-reset-all'
   | 'color-keys-section-actions'
   | 'color-keys-section-keys'
-  | 'color-keys-section-pdf'
   | 'color-keys-unset';
