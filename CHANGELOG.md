@@ -2,6 +2,17 @@
 
 All notable changes to this project are documented in this file.
 
+## [0.1.1] - 2026-10-25
+
+### Added
+
+- Plugin icon shown in Zotero's add-on manager and the add-on market
+
+### Changed
+
+- README redesigned: banner, badges, shortcut tables, install and troubleshooting sections
+- Repository description and topics for better discoverability
+
 ## [0.1.0] - 2026-10-23
 
 ### Added
