@@ -2,6 +2,17 @@
 
 All notable changes to this project are documented in this file.
 
+## [0.2.0-beta.5] - 2026-10-26
+
+### Fixed
+
+- Applying a color shortcut to an already-annotated selection now honors the modifier: `Alt` converts the annotation to underline (then colors it), `Ctrl+Alt` converts to highlight
+
+### Changed
+
+- Settings help texts shortened for both notes and PDF; added a dedicated PDF behavior explanation
+- AGENTS.md updated to the final feature set and the Zotero internal-API dependency list
+
 ## [0.2.0-beta.4] - 2026-10-26
 
 ### Changed

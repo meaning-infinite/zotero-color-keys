@@ -87,7 +87,7 @@ function applyColor(reader: any, type: PdfAnnotationType, colorName: string): bo
     const view = reader._lastView;
     if (!view) return false;
 
-    // 1) 已点选的批注：直接改色
+    // 1) 已点选的批注：类型不一致时先转换类型，再改色
     const selected = state.selectedAnnotationIDs || [];
     const selectedTargets = [];
     for (const id of selected) {
@@ -95,6 +95,10 @@ function applyColor(reader: any, type: PdfAnnotationType, colorName: string): bo
       if (annotation && !annotation.readOnly) selectedTargets.push(annotation);
     }
     if (selectedTargets.length) {
+      const needConvert = selectedTargets.filter((a) => a.type !== type && (a.type === "highlight" || a.type === "underline"));
+      if (needConvert.length && typeof reader.convertAnnotations === "function") {
+        reader.convertAnnotations(needConvert.map((a) => a.id), type);
+      }
       manager.updateAnnotations(selectedTargets.map((a) => ({ id: a.id, color: hex })));
       if (view._onSetSelectionPopup) view._onSetSelectionPopup();
       return true;

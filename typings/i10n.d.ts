@@ -26,6 +26,7 @@ export type FluentMessageId =
   | 'color-keys-diagnostics'
   | 'color-keys-help'
   | 'color-keys-name'
+  | 'color-keys-note-help'
   | 'color-keys-pdf-help'
   | 'color-keys-prefs-heading'
   | 'color-keys-prefs-title'

@@ -1,5 +1,6 @@
 color-keys-prefs-heading = 色彩快捷鍵
-color-keys-help = 選取文字後按快捷鍵設定顏色；沒有選取時作用於目前段落。再按同一種顏色可取消。
+color-keys-help = 筆記中：Alt+字母 改文字顏色，Ctrl+Alt+字母 改螢光標記；同色再按取消，沒有選取時作用於目前段落。
+color-keys-note-help = 筆記編輯器中選取文字後按快捷鍵即可上色，再按同色取消；沒有選取時作用於目前段落。
 color-keys-section-keys = 顏色與快捷鍵
 color-keys-column-color = 顏色
 color-keys-column-text = 文字顏色
@@ -8,7 +9,7 @@ color-keys-column-action = 動作
 color-keys-column-key = 快捷鍵
 color-keys-section-actions = 清除
 color-keys-section-pdf = PDF 閱讀器
-color-keys-pdf-help = 閱讀器中：Alt+字母 改底線顏色，Ctrl+Alt+字母 改螢光標記顏色；焦點在側欄註釋輸入框時同樣生效。選取文字後的工具列中，預設點顏色 = 底線，按住 Ctrl 點顏色 = 螢光標記。
+color-keys-pdf-help = PDF 中：Alt+字母 改底線顏色（若選取的是螢光標記會轉成底線），Ctrl+Alt+字母 改螢光標記顏色（反之亦然）。選取文字彈窗中預設點色=底線，按住 Ctrl 點色=螢光標記；快捷鍵在側欄註釋輸入框聚焦時同樣生效。
 color-keys-color-red = 紅
 color-keys-color-orange = 橙
 color-keys-color-yellow = 黃
