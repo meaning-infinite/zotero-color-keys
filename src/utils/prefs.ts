@@ -1,12 +1,6 @@
 import { config } from "../../package.json";
 
-type PrefKey =
-  | "enable"
-  | "debug"
-  | "keymap"
-  | "pdfTabRefocus"
-  | "pdfShowToolbarColors"
-  | "pdfColorClickAction";
+type PrefKey = "enable" | "debug" | "keymap" | "pdfTabRefocus";
 type PrefValue = string | number | boolean;
 
 const PREFIX = config.prefsPrefix;

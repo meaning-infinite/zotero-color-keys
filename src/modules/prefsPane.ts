@@ -1,9 +1,19 @@
 /**
- * 设置面板：渲染颜色/高亮/清除三组键位行，处理录制、冲突提示、恢复默认、诊断。
+ * 设置面板：
+ * - 颜色与快捷键：多列网格（纵向为颜色），同时配置文字颜色与高亮两组键位
+ * - 清除动作：单独一组
+ * - 只保留一个"全部恢复默认"按钮
+ * - PDF 阅读器：Tab 跳回阅读器开关 + 使用说明
+ * - 诊断信息
  */
 
 import { config } from "../../package.json";
-import { COLOR_NAMES, type ColorName, highlightColorHex, textColorHex } from "./colors";
+import {
+  COLOR_NAMES,
+  type ColorName,
+  highlightColorHex,
+  textColorHex,
+} from "./colors";
 import { diagnostics } from "./diagnostics";
 import { attachRecorder } from "./hotkeyRecorder";
 import { getString } from "../utils/locale";
@@ -15,11 +25,7 @@ import {
   type Keymap,
 } from "./keymap";
 import { DEFAULT_KEYMAP, cloneKeymap } from "./keymapDefaults";
-import {
-  getKeymap,
-  resetKeymapToDefaults,
-  saveKeymap,
-} from "./keymapStore";
+import { getKeymap, resetKeymapToDefaults, saveKeymap } from "./keymapStore";
 import { getPref, setPref } from "../utils/prefs";
 
 const HTML_NS = "http://www.w3.org/1999/xhtml";
@@ -50,10 +56,10 @@ function setAction(keymap: Keymap, action: ActionId, raw: string): void {
 
 function commandLabel(command: CommandId): string {
   if (command.startsWith("textColor.")) {
-    return `${getString(`color-${command.slice("textColor.".length)}`)}`;
+    return getString(`color-${command.slice("textColor.".length)}`);
   }
   if (command.startsWith("backgroundColor.")) {
-    return `${getString(`color-${command.slice("backgroundColor.".length)}`)}`;
+    return getString(`color-${command.slice("backgroundColor.".length)}`);
   }
   const action = command.slice("actions.".length) as ActionId;
   return getString(ACTION_LABEL_KEYS[action]);
@@ -73,16 +79,18 @@ export function initPrefsPane(win: Window): void {
 
 function renderPane(win: any): void {
   const doc: Document = win.document;
-  const textRows = doc.getElementById(prefixed("text-rows"));
-  const highlightRows = doc.getElementById(prefixed("highlight-rows"));
+  const grid = doc.getElementById(prefixed("keymap-grid"));
   const actionRows = doc.getElementById(prefixed("action-rows"));
   const status = doc.getElementById(prefixed("status"));
   const diagnosticsEl = doc.getElementById(prefixed("diagnostics"));
   const resetAll = doc.getElementById(prefixed("reset-all"));
-  if (!textRows || !highlightRows || !actionRows) return;
+  const pdfOptions = doc.getElementById(prefixed("pdf-options"));
+  if (!grid || !actionRows) return;
 
-  for (const container of [textRows, highlightRows, actionRows]) {
-    while (container.firstChild) container.removeChild(container.firstChild);
+  for (const container of [grid, actionRows, pdfOptions]) {
+    while (container && container.firstChild) {
+      container.removeChild(container.firstChild);
+    }
   }
 
   const keymap = getKeymap();
@@ -90,53 +98,22 @@ function renderPane(win: any): void {
   const commit = (mutate: (target: Keymap) => void): void => {
     const next = cloneKeymap(getKeymap());
     mutate(next);
-    if (saveKeymap(next)) {
-      renderPane(win);
-    }
+    if (saveKeymap(next)) renderPane(win);
   };
 
-  const addRow = (
-    container: Element,
-    label: string,
-    raw: string,
-    defaultRaw: string,
-    swatchHex: string | null,
-    onRecord: (raw: string) => void,
-  ): void => {
-    const row = createEl(doc, "div", "color-keys-row");
+  const makeRow = (): HTMLElement => {
+    const row = createEl(doc, "div", "color-keys-grid-row");
     row.style.display = "flex";
     row.style.alignItems = "center";
-    row.style.gap = "8px";
-    row.style.margin = "3px 0";
+    row.style.gap = "10px";
+    row.style.margin = "4px 0";
+    return row;
+  };
 
-    if (swatchHex) {
-      const swatch = createEl(doc, "span", "color-keys-swatch");
-      swatch.style.display = "inline-block";
-      swatch.style.width = "14px";
-      swatch.style.height = "14px";
-      swatch.style.borderRadius = "3px";
-      swatch.style.border = "1px solid rgba(0,0,0,0.25)";
-      swatch.style.backgroundColor = swatchHex;
-      row.appendChild(swatch);
-    }
-
-    const labelEl = createEl(doc, "span", "color-keys-label");
-    labelEl.textContent = label;
-    labelEl.style.minWidth = "170px";
-    row.appendChild(labelEl);
-
+  const makeInput = (raw: string, onRecord: (raw: string) => void): HTMLInputElement => {
     const input = createEl(doc, "input", "color-keys-recorder") as HTMLInputElement;
     input.readOnly = true;
-    input.style.width = "190px";
-    row.appendChild(input);
-
-    const reset = createEl(doc, "button", "color-keys-reset") as HTMLButtonElement;
-    reset.textContent = getString("reset");
-    reset.addEventListener("click", () => onRecord(defaultRaw));
-    row.appendChild(reset);
-
-    container.appendChild(row);
-
+    input.style.width = "160px";
     attachRecorder(input, {
       isMac: Zotero.isMac,
       raw,
@@ -144,39 +121,83 @@ function renderPane(win: any): void {
       recordingText: getString("recording"),
       onRecord,
     });
+    return input;
   };
 
+  // 表头
+  const header = makeRow();
+  const headColor = createEl(doc, "span", "color-keys-head");
+  headColor.textContent = getString("column-color");
+  headColor.style.minWidth = "190px";
+  headColor.style.fontWeight = "600";
+  const headText = createEl(doc, "span", "color-keys-head");
+  headText.textContent = getString("column-text");
+  headText.style.width = "160px";
+  headText.style.fontWeight = "600";
+  const headHighlight = createEl(doc, "span", "color-keys-head");
+  headHighlight.textContent = getString("column-highlight");
+  headHighlight.style.width = "160px";
+  headHighlight.style.fontWeight = "600";
+  header.append(headColor, headText, headHighlight);
+  grid.appendChild(header);
+
+  const separator = createEl(doc, "div");
+  separator.style.borderTop = "1px solid rgba(128,128,128,0.35)";
+  separator.style.margin = "4px 0 6px";
+  separator.style.width = "100%";
+  grid.appendChild(separator);
+
+  // 每个颜色一行：色块 + 名称 | 文字颜色键 | 高亮键
   for (const color of COLOR_NAMES) {
-    addRow(
-      textRows,
-      getString(`color-${color}`),
-      keymap.textColor[color],
-      DEFAULT_KEYMAP.textColor[color],
-      textColorHex(color),
-      (raw) => commit((target) => setTextColor(target, color, raw)),
+    const row = makeRow();
+
+    const labelCell = createEl(doc, "span", "color-keys-color-cell");
+    labelCell.style.display = "inline-flex";
+    labelCell.style.alignItems = "center";
+    labelCell.style.gap = "8px";
+    labelCell.style.minWidth = "190px";
+
+    const swatch = createEl(doc, "span", "color-keys-swatch");
+    swatch.style.display = "inline-block";
+    swatch.style.width = "14px";
+    swatch.style.height = "14px";
+    swatch.style.borderRadius = "3px";
+    swatch.style.border = "1px solid rgba(0,0,0,0.25)";
+    swatch.style.backgroundColor = textColorHex(color);
+
+    const name = createEl(doc, "span");
+    name.textContent = getString(`color-${color}`);
+
+    labelCell.append(swatch, name);
+    row.appendChild(labelCell);
+
+    row.appendChild(
+      makeInput(keymap.textColor[color], (raw) =>
+        commit((target) => setTextColor(target, color, raw)),
+      ),
     );
+    row.appendChild(
+      makeInput(keymap.backgroundColor[color], (raw) =>
+        commit((target) => setHighlightColor(target, color, raw)),
+      ),
+    );
+
+    grid.appendChild(row);
   }
 
-  for (const color of COLOR_NAMES) {
-    addRow(
-      highlightRows,
-      getString(`color-${color}`),
-      keymap.backgroundColor[color],
-      DEFAULT_KEYMAP.backgroundColor[color],
-      highlightColorHex(color).slice(0, 7),
-      (raw) => commit((target) => setHighlightColor(target, color, raw)),
-    );
-  }
-
+  // 清除动作
   for (const action of ["clearTextColor", "clearHighlight", "clearAll"] as ActionId[]) {
-    addRow(
-      actionRows,
-      getString(ACTION_LABEL_KEYS[action]),
-      keymap.actions[action],
-      DEFAULT_KEYMAP.actions[action],
-      null,
-      (raw) => commit((target) => setAction(target, action, raw)),
+    const row = makeRow();
+    const label = createEl(doc, "span");
+    label.textContent = getString(ACTION_LABEL_KEYS[action]);
+    label.style.minWidth = "190px";
+    row.appendChild(label);
+    row.appendChild(
+      makeInput(keymap.actions[action], (raw) =>
+        commit((target) => setAction(target, action, raw)),
+      ),
     );
+    actionRows.appendChild(row);
   }
 
   // 冲突提示
@@ -194,73 +215,37 @@ function renderPane(win: any): void {
   }
 
   // PDF 阅读器选项
-  const pdfOptions = doc.getElementById(prefixed("pdf-options"));
   if (pdfOptions) {
-    while (pdfOptions.firstChild) pdfOptions.removeChild(pdfOptions.firstChild);
+    const row = createEl(doc, "div", "color-keys-pdf-row");
+    row.style.display = "flex";
+    row.style.alignItems = "center";
+    row.style.gap = "6px";
+    row.style.margin = "3px 0";
 
-    const addCheckbox = (
-      labelKey: string,
-      prefKey: "pdfTabRefocus" | "pdfShowToolbarColors",
-    ): void => {
-      const row = createEl(doc, "div", "color-keys-pdf-row");
-      row.style.display = "flex";
-      row.style.alignItems = "center";
-      row.style.gap = "6px";
-      row.style.margin = "3px 0";
-
-      const checkbox = createEl(doc, "input") as HTMLInputElement;
-      checkbox.type = "checkbox";
-      checkbox.checked = getPref(prefKey) !== false;
-      checkbox.addEventListener("change", () => {
-        setPref(prefKey, checkbox.checked);
-      });
-
-      const label = createEl(doc, "span", "color-keys-label");
-      label.textContent = getString(labelKey);
-
-      row.appendChild(checkbox);
-      row.appendChild(label);
-      pdfOptions.appendChild(row);
-    };
-
-    addCheckbox("pdf-tab-refocus", "pdfTabRefocus");
-    addCheckbox("pdf-toolbar-colors", "pdfShowToolbarColors");
-
-    const selectRow = createEl(doc, "div", "color-keys-pdf-row");
-    selectRow.style.display = "flex";
-    selectRow.style.alignItems = "center";
-    selectRow.style.gap = "6px";
-    selectRow.style.margin = "3px 0";
-
-    const selectLabel = createEl(doc, "span", "color-keys-label");
-    selectLabel.textContent = getString("pdf-click-action");
-    selectLabel.style.minWidth = "170px";
-
-    const select = createEl(doc, "select") as HTMLSelectElement;
-    for (const [value, labelKey] of [
-      ["apply", "pdf-click-apply"],
-      ["set-tool", "pdf-click-set-tool"],
-    ] as const) {
-      const option = createEl(doc, "option") as HTMLOptionElement;
-      option.value = value;
-      option.textContent = getString(labelKey);
-      if (String(getPref("pdfColorClickAction")) === value) option.selected = true;
-      select.appendChild(option);
-    }
-    select.addEventListener("change", () => {
-      setPref("pdfColorClickAction", select.value);
+    const checkbox = createEl(doc, "input") as HTMLInputElement;
+    checkbox.type = "checkbox";
+    checkbox.checked = getPref("pdfTabRefocus") !== false;
+    checkbox.addEventListener("change", () => {
+      setPref("pdfTabRefocus", checkbox.checked);
     });
 
-    selectRow.appendChild(selectLabel);
-    selectRow.appendChild(select);
-    pdfOptions.appendChild(selectRow);
+    const label = createEl(doc, "span");
+    label.textContent = getString("pdf-tab-refocus");
+    row.append(checkbox, label);
+    pdfOptions.appendChild(row);
+
+    const help = createEl(doc, "div", "color-keys-pdf-help");
+    help.textContent = getString("pdf-help");
+    help.style.opacity = "0.75";
+    help.style.marginTop = "4px";
+    help.style.maxWidth = "640px";
+    help.style.whiteSpace = "normal";
+    pdfOptions.appendChild(help);
   }
 
   // 诊断信息
   if (diagnosticsEl) {
-    const bn = diagnostics.betterNotes
-      ? getString("bn-yes")
-      : getString("bn-no");
+    const bn = diagnostics.betterNotes ? getString("bn-yes") : getString("bn-no");
     diagnosticsEl.textContent = getString("diagnostics", {
       args: {
         attached: diagnostics.attachedEditors,

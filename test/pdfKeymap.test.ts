@@ -32,19 +32,16 @@ describe("resolvePdfColorCommand", () => {
     ).toEqual({ type: "highlight", color: "gray" });
   });
 
-  it("maps Shift+Alt+letter to note colors", () => {
-    expect(
-      resolvePdfColorCommand(evt({ altKey: true, shiftKey: true }), false, DEFAULT_KEYMAP),
-    ).toEqual({ type: "note", color: "red" });
-  });
-
   it("maps Cmd+Option on macOS like Ctrl+Alt on Windows", () => {
     expect(
       resolvePdfColorCommand(evt({ key: "y", metaKey: true, altKey: true }), true, DEFAULT_KEYMAP),
     ).toEqual({ type: "highlight", color: "yellow" });
   });
 
-  it("ignores keys without Alt or unknown letters", () => {
+  it("ignores Shift+Alt, keys without Alt and unknown letters", () => {
+    expect(
+      resolvePdfColorCommand(evt({ altKey: true, shiftKey: true }), false, DEFAULT_KEYMAP),
+    ).toBeNull();
     expect(resolvePdfColorCommand(evt({ ctrlKey: true }), false, DEFAULT_KEYMAP)).toBeNull();
     expect(resolvePdfColorCommand(evt({ altKey: true, key: "z" }), false, DEFAULT_KEYMAP)).toBeNull();
   });

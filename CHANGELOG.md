@@ -2,6 +2,23 @@
 
 All notable changes to this project are documented in this file.
 
+## [0.2.0-beta.3] - 2026-10-25
+
+### Added
+
+- Selection popup redesign: the two native highlight/underline buttons are hidden and replaced by one mode indicator; hold Ctrl/Cmd to switch it to highlight mode
+- Clicking a color in the selection popup applies an underline color by default, or a highlight color while Ctrl/Cmd is held
+- Settings: Tab / Shift+Tab explanation for the sidebar annotation box focus problem
+
+### Changed
+
+- Settings keymap section is now a compact grid: one row per color, with text-color and highlight columns; only one "reset all" button remains
+- PDF `Shift+Alt` note-color shortcut removed (not a native Zotero behavior)
+
+### Removed
+
+- Reader toolbar color swatches and their settings (misread requirement; the target was the selection popup)
+
 ## [0.2.0-beta.2] - 2026-10-25
 
 ### Added
