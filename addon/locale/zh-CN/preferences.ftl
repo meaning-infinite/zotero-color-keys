@@ -4,10 +4,11 @@ color-keys-section-keys = 颜色与快捷键
 color-keys-column-color = 颜色
 color-keys-column-text = 文字颜色
 color-keys-column-highlight = 高亮
+color-keys-column-action = 动作
+color-keys-column-key = 快捷键
 color-keys-section-actions = 清除
 color-keys-section-pdf = PDF 阅读器
-color-keys-pdf-tab-refocus = 让 Tab / Shift+Tab 从注释输入框跳回阅读器
-color-keys-pdf-help = 点选已有的高亮或下划线会自动聚焦到侧栏的注释输入框；此时按 Tab 或 Shift+Tab 跳回阅读器，即可用颜色快捷键改色。
+color-keys-pdf-help = 阅读器中：Alt+字母 改下划线颜色，Ctrl+Alt+字母 改高亮颜色；焦点在侧栏注释输入框时同样生效。选中文本后的工具条里，默认点颜色 = 下划线，按住 Ctrl 点颜色 = 高亮。
 color-keys-color-red = 红
 color-keys-color-orange = 橙
 color-keys-color-yellow = 黄

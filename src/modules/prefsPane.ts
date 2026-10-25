@@ -1,9 +1,9 @@
 /**
  * 设置面板：
- * - 颜色与快捷键：多列网格（纵向为颜色），同时配置文字颜色与高亮两组键位
- * - 清除动作：单独一组
+ * - 颜色与快捷键：表格布局（一行一种颜色，两列分别配置文字色/高亮键）
+ * - 清除动作：表格布局
  * - 只保留一个"全部恢复默认"按钮
- * - PDF 阅读器：Tab 跳回阅读器开关 + 使用说明
+ * - PDF 阅读器：使用说明（快捷键在注释输入框聚焦时同样生效）
  * - 诊断信息
  */
 
@@ -26,7 +26,6 @@ import {
 } from "./keymap";
 import { DEFAULT_KEYMAP, cloneKeymap } from "./keymapDefaults";
 import { getKeymap, resetKeymapToDefaults, saveKeymap } from "./keymapStore";
-import { getPref, setPref } from "../utils/prefs";
 
 const HTML_NS = "http://www.w3.org/1999/xhtml";
 
@@ -101,19 +100,43 @@ function renderPane(win: any): void {
     if (saveKeymap(next)) renderPane(win);
   };
 
-  const makeRow = (): HTMLElement => {
-    const row = createEl(doc, "div", "color-keys-grid-row");
-    row.style.display = "flex";
-    row.style.alignItems = "center";
-    row.style.gap = "10px";
-    row.style.margin = "4px 0";
-    return row;
+  const makeTable = (headers: string[] | null): HTMLTableElement => {
+    const table = createEl(doc, "table", "color-keys-table") as HTMLTableElement;
+    table.style.borderCollapse = "collapse";
+    table.style.margin = "4px 0 8px";
+    table.style.border = "1px solid rgba(128,128,128,0.3)";
+    if (headers) {
+      const thead = doc.createElement("thead");
+      const tr = doc.createElement("tr");
+      for (const text of headers) {
+        const th = doc.createElement("th");
+        th.textContent = text;
+        th.style.padding = "6px 12px";
+        th.style.textAlign = "center";
+        th.style.fontWeight = "600";
+        th.style.borderBottom = "1px solid rgba(128,128,128,0.35)";
+        tr.appendChild(th);
+      }
+      thead.appendChild(tr);
+      table.appendChild(thead);
+    }
+    return table;
   };
 
-  const makeInput = (raw: string, onRecord: (raw: string) => void): HTMLInputElement => {
+  const makeInputCell = (
+    raw: string,
+    onRecord: (raw: string) => void,
+  ): HTMLTableCellElement => {
+    const td = doc.createElement("td");
+    td.style.padding = "4px 10px";
+    td.style.textAlign = "center";
+    td.style.verticalAlign = "middle";
+    td.style.borderBottom = "1px solid rgba(128,128,128,0.15)";
+
     const input = createEl(doc, "input", "color-keys-recorder") as HTMLInputElement;
     input.readOnly = true;
-    input.style.width = "160px";
+    input.style.width = "150px";
+    input.style.textAlign = "center";
     attachRecorder(input, {
       isMac: Zotero.isMac,
       raw,
@@ -121,41 +144,31 @@ function renderPane(win: any): void {
       recordingText: getString("recording"),
       onRecord,
     });
-    return input;
+    td.appendChild(input);
+    return td;
   };
 
-  // 表头
-  const header = makeRow();
-  const headColor = createEl(doc, "span", "color-keys-head");
-  headColor.textContent = getString("column-color");
-  headColor.style.minWidth = "190px";
-  headColor.style.fontWeight = "600";
-  const headText = createEl(doc, "span", "color-keys-head");
-  headText.textContent = getString("column-text");
-  headText.style.width = "160px";
-  headText.style.fontWeight = "600";
-  const headHighlight = createEl(doc, "span", "color-keys-head");
-  headHighlight.textContent = getString("column-highlight");
-  headHighlight.style.width = "160px";
-  headHighlight.style.fontWeight = "600";
-  header.append(headColor, headText, headHighlight);
-  grid.appendChild(header);
+  // 颜色 × 快捷键表格
+  const table = makeTable([
+    getString("column-color"),
+    getString("column-text"),
+    getString("column-highlight"),
+  ]);
+  const tbody = doc.createElement("tbody");
 
-  const separator = createEl(doc, "div");
-  separator.style.borderTop = "1px solid rgba(128,128,128,0.35)";
-  separator.style.margin = "4px 0 6px";
-  separator.style.width = "100%";
-  grid.appendChild(separator);
-
-  // 每个颜色一行：色块 + 名称 | 文字颜色键 | 高亮键
   for (const color of COLOR_NAMES) {
-    const row = makeRow();
+    const tr = doc.createElement("tr");
 
-    const labelCell = createEl(doc, "span", "color-keys-color-cell");
-    labelCell.style.display = "inline-flex";
-    labelCell.style.alignItems = "center";
-    labelCell.style.gap = "8px";
-    labelCell.style.minWidth = "190px";
+    const colorCell = doc.createElement("td");
+    colorCell.style.padding = "4px 12px";
+    colorCell.style.verticalAlign = "middle";
+    colorCell.style.borderBottom = "1px solid rgba(128,128,128,0.15)";
+    colorCell.style.whiteSpace = "nowrap";
+
+    const inner = createEl(doc, "span");
+    inner.style.display = "inline-flex";
+    inner.style.alignItems = "center";
+    inner.style.gap = "8px";
 
     const swatch = createEl(doc, "span", "color-keys-swatch");
     swatch.style.display = "inline-block";
@@ -168,37 +181,49 @@ function renderPane(win: any): void {
     const name = createEl(doc, "span");
     name.textContent = getString(`color-${color}`);
 
-    labelCell.append(swatch, name);
-    row.appendChild(labelCell);
+    inner.append(swatch, name);
+    colorCell.appendChild(inner);
+    tr.appendChild(colorCell);
 
-    row.appendChild(
-      makeInput(keymap.textColor[color], (raw) =>
+    tr.appendChild(
+      makeInputCell(keymap.textColor[color], (raw) =>
         commit((target) => setTextColor(target, color, raw)),
       ),
     );
-    row.appendChild(
-      makeInput(keymap.backgroundColor[color], (raw) =>
+    tr.appendChild(
+      makeInputCell(keymap.backgroundColor[color], (raw) =>
         commit((target) => setHighlightColor(target, color, raw)),
       ),
     );
 
-    grid.appendChild(row);
+    tbody.appendChild(tr);
   }
+  table.appendChild(tbody);
+  grid.appendChild(table);
 
-  // 清除动作
+  // 清除动作表格
+  const actionTable = makeTable([getString("column-action"), getString("column-key")]);
+  const actionBody = doc.createElement("tbody");
   for (const action of ["clearTextColor", "clearHighlight", "clearAll"] as ActionId[]) {
-    const row = makeRow();
-    const label = createEl(doc, "span");
-    label.textContent = getString(ACTION_LABEL_KEYS[action]);
-    label.style.minWidth = "190px";
-    row.appendChild(label);
-    row.appendChild(
-      makeInput(keymap.actions[action], (raw) =>
+    const tr = doc.createElement("tr");
+
+    const labelCell = doc.createElement("td");
+    labelCell.textContent = getString(ACTION_LABEL_KEYS[action]);
+    labelCell.style.padding = "4px 12px";
+    labelCell.style.verticalAlign = "middle";
+    labelCell.style.borderBottom = "1px solid rgba(128,128,128,0.15)";
+    labelCell.style.whiteSpace = "nowrap";
+    tr.appendChild(labelCell);
+
+    tr.appendChild(
+      makeInputCell(keymap.actions[action], (raw) =>
         commit((target) => setAction(target, action, raw)),
       ),
     );
-    actionRows.appendChild(row);
+    actionBody.appendChild(tr);
   }
+  actionTable.appendChild(actionBody);
+  actionRows.appendChild(actionTable);
 
   // 冲突提示
   if (status) {
@@ -214,32 +239,14 @@ function renderPane(win: any): void {
     }
   }
 
-  // PDF 阅读器选项
+  // PDF 阅读器说明
   if (pdfOptions) {
-    const row = createEl(doc, "div", "color-keys-pdf-row");
-    row.style.display = "flex";
-    row.style.alignItems = "center";
-    row.style.gap = "6px";
-    row.style.margin = "3px 0";
-
-    const checkbox = createEl(doc, "input") as HTMLInputElement;
-    checkbox.type = "checkbox";
-    checkbox.checked = getPref("pdfTabRefocus") !== false;
-    checkbox.addEventListener("change", () => {
-      setPref("pdfTabRefocus", checkbox.checked);
-    });
-
-    const label = createEl(doc, "span");
-    label.textContent = getString("pdf-tab-refocus");
-    row.append(checkbox, label);
-    pdfOptions.appendChild(row);
-
     const help = createEl(doc, "div", "color-keys-pdf-help");
     help.textContent = getString("pdf-help");
-    help.style.opacity = "0.75";
-    help.style.marginTop = "4px";
-    help.style.maxWidth = "640px";
+    help.style.opacity = "0.8";
+    help.style.maxWidth = "700px";
     help.style.whiteSpace = "normal";
+    help.style.lineHeight = "1.5";
     pdfOptions.appendChild(help);
   }
 

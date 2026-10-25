@@ -1,6 +1,6 @@
 import { config } from "../../package.json";
 
-type PrefKey = "enable" | "debug" | "keymap" | "pdfTabRefocus";
+type PrefKey = "enable" | "debug" | "keymap";
 type PrefValue = string | number | boolean;
 
 const PREFIX = config.prefsPrefix;

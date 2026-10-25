@@ -4,10 +4,11 @@ color-keys-section-keys = 顏色與快捷鍵
 color-keys-column-color = 顏色
 color-keys-column-text = 文字顏色
 color-keys-column-highlight = 螢光標記
+color-keys-column-action = 動作
+color-keys-column-key = 快捷鍵
 color-keys-section-actions = 清除
 color-keys-section-pdf = PDF 閱讀器
-color-keys-pdf-tab-refocus = 讓 Tab / Shift+Tab 從註釋輸入框跳回閱讀器
-color-keys-pdf-help = 點選既有的螢光標記或底線會自動聚焦到側欄的註釋輸入框；此時按 Tab 或 Shift+Tab 跳回閱讀器，即可用顏色快捷鍵改色。
+color-keys-pdf-help = 閱讀器中：Alt+字母 改底線顏色，Ctrl+Alt+字母 改螢光標記顏色；焦點在側欄註釋輸入框時同樣生效。選取文字後的工具列中，預設點顏色 = 底線，按住 Ctrl 點顏色 = 螢光標記。
 color-keys-color-red = 紅
 color-keys-color-orange = 橙
 color-keys-color-yellow = 黃

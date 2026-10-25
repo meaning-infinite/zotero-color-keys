@@ -2,6 +2,18 @@
 
 All notable changes to this project are documented in this file.
 
+## [0.2.0-beta.4] - 2026-10-26
+
+### Changed
+
+- Color shortcuts now work while the sidebar annotation input box has focus, so Tab refocusing is no longer needed (Tab handling removed)
+- Selection popup: the mode indicator is merged into the first (color) row; the second row is a single gray hint line, with tighter spacing
+- Settings keymap section switched to a real table with centered headers and inputs; single reset button kept
+
+### Fixed
+
+- Diagnostics PDF reader count now reflects currently open readers instead of a stale attachment count
+
 ## [0.2.0-beta.3] - 2026-10-25
 
 ### Added

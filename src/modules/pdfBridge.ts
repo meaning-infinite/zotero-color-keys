@@ -1,19 +1,16 @@
 /**
  * PDF 阅读器桥接。
  *
- * 快捷键语义（pdfKeymap.ts）：
+ * 快捷键（pdfKeymap.ts）：
  * - Alt+字母      → 下划线颜色
  * - Ctrl+Alt+字母 → 高亮颜色
- * - Tab / Shift+Tab：从侧栏注释输入框跳回阅读器正文，之后颜色快捷键可用
+ * - 焦点在侧栏注释输入框时同样生效（不拦截普通输入，仅拦截含 Alt 的组合）
  *
- * 另外接管选区弹窗（selection popup）：
- * - 隐藏原生"高亮/下划线"两个 A 按钮，改为一个随 Ctrl 切换的指示图标
- * - 点击颜色块：默认给下划线上色，按住 Ctrl 给高亮上色
- *
- * 实现要点：
- * - PDF.js 在阅读器 UI 的孙级 iframe，keydown 不冒泡，监听必须挂到 view iframe
- * - 批注增改在阅读器内容分区内执行（win.eval），避免 Xray 跨分区
- * - 改色走 _annotationManager.updateAnnotations（原生同款，可撤销）
+ * 选区弹窗精简：
+ * - 隐藏原生"高亮/下划线"两个 A 按钮
+ * - 第一行颜色行最左侧叠加一个模式指示器（默认下划线，按住 Ctrl/Cmd 变高亮色块）
+ * - 第二行只保留一行灰色极简说明，行距压缩
+ * - 点颜色：默认下划线；按住 Ctrl/Cmd 点 = 高亮
  */
 
 import { config } from "../../package.json";
@@ -21,7 +18,6 @@ import { diagnostics, recordError } from "./diagnostics";
 import { comboFromEvent, matchCommand } from "./keymap";
 import { getKeymap } from "./keymapStore";
 import { resolvePdfColorCommand, type PdfAnnotationType } from "./pdfKeymap";
-import { getPref } from "../utils/prefs";
 
 export const ANNOTATION_COLORS: Record<string, string> = {
   yellow: "#ffd400",
@@ -52,25 +48,6 @@ function getReaderWindow(reader: any): any {
   }
 }
 
-function getViewWindow(reader: any): any {
-  try {
-    return reader?._internalReader?._lastView?._iframeWindow ?? null;
-  } catch {
-    return null;
-  }
-}
-
-function isTextBoxTarget(target: any): boolean {
-  try {
-    const tag = String(target?.tagName ?? "").toLowerCase();
-    if (tag === "input" || tag === "textarea" || tag === "select") return true;
-    if (target?.isContentEditable) return true;
-  } catch {
-    /* ignore */
-  }
-  return false;
-}
-
 function execInReader(reader: any, body: string): boolean {
   const win = getReaderWindow(reader);
   if (!win?.eval) return false;
@@ -92,7 +69,6 @@ function getLastColors(reader: any): { underline: string; highlight: string } {
   return colors;
 }
 
-/** 给选中批注改色；或给文本选区新建高亮/下划线。 */
 function applyColor(reader: any, type: PdfAnnotationType, colorName: string): boolean {
   const hex = ANNOTATION_COLORS[colorName];
   if (!hex) return false;
@@ -111,7 +87,7 @@ function applyColor(reader: any, type: PdfAnnotationType, colorName: string): bo
     const view = reader._lastView;
     if (!view) return false;
 
-    // 1) 已点选的批注：直接改色（与 Zotero 原生右键菜单一致）
+    // 1) 已点选的批注：直接改色
     const selected = state.selectedAnnotationIDs || [];
     const selectedTargets = [];
     for (const id of selected) {
@@ -149,26 +125,11 @@ function applyColor(reader: any, type: PdfAnnotationType, colorName: string): bo
   return ok;
 }
 
-function focusReaderView(reader: any): void {
-  const viewWin = getViewWindow(reader);
-  try {
-    if (viewWin) {
-      viewWin.focus();
-      viewWin.document?.body?.focus?.();
-      return;
-    }
-    execInReader(reader, "window._reader && window._reader.focusView && window._reader.focusView(true); return true;");
-  } catch (error) {
-    recordError("focusReaderView", error);
-  }
-}
-
 function setCtrlState(reader: any, down: boolean): void {
   ctrlDown.set(reader, down);
   try {
     const doc = getReaderWindow(reader)?.document;
-    const root = doc?.documentElement;
-    if (root) root.classList.toggle("color-keys-ctrl", down);
+    doc?.documentElement?.classList.toggle("color-keys-ctrl", down);
   } catch {
     /* ignore */
   }
@@ -179,7 +140,7 @@ function isAccelPressed(reader: any): boolean {
 }
 
 // ---------------------------------------------------------------------------
-// 选区弹窗优化
+// 选区弹窗
 // ---------------------------------------------------------------------------
 
 function injectPopupStyle(reader: any): void {
@@ -189,29 +150,28 @@ function injectPopupStyle(reader: any): void {
     if (doc.getElementById("color-keys-popup-style")) return;
     const style = doc.createElement("style");
     style.id = "color-keys-popup-style";
-    // 1) 隐藏原生的高亮/下划线两个 A 按钮，改成单个模式指示器
-    // 2) 指示器默认显示"下划线"，按住 Ctrl/Cmd 显示"高亮"
     style.textContent = `
+      .selection-popup { padding: 6px 8px !important; }
       .selection-popup .tool-toggle { display: none !important; }
-      .color-keys-mode {
-        display: flex; align-items: center; gap: 6px;
-        padding: 2px 0 4px; font-size: 15px; line-height: 1;
+      .selection-popup .colors {
+        display: flex; align-items: center; gap: 4px;
+        padding: 0 0 2px 0; margin: 0;
       }
-      .color-keys-mode .ck-icon {
+      .selection-popup .color-keys-mode-badge {
         display: inline-flex; align-items: center; justify-content: center;
-        min-width: 18px; height: 16px; padding: 0 2px; font-weight: 700;
-      }
-      .color-keys-mode .ck-underline {
-        border-bottom: 3px solid var(--ck-underline-color, #ff6666);
-      }
-      .color-keys-mode .ck-highlight {
-        display: none;
+        min-width: 16px; height: 14px; padding: 0 2px;
+        font-size: 12px; font-weight: 700; line-height: 1;
         border-radius: 3px;
-        background: var(--ck-highlight-color, #ffd400);
+        border-bottom: 2px solid var(--ck-underline-color, #ff6666);
       }
-      html.color-keys-ctrl .color-keys-mode .ck-underline { display: none; }
-      html.color-keys-ctrl .color-keys-mode .ck-highlight { display: inline-flex; }
-      .color-keys-mode .ck-hint { opacity: .65; font-size: 11px; }
+      html.color-keys-ctrl .selection-popup .color-keys-mode-badge {
+        background: var(--ck-highlight-color, #ffd400);
+        border-bottom: none;
+      }
+      .selection-popup .color-keys-hint {
+        font-size: 10px; line-height: 1.1; opacity: .55;
+        margin: 0 0 2px 0; padding: 0 0 0 2px;
+      }
     `;
     doc.head.appendChild(style);
   } catch (error) {
@@ -224,37 +184,36 @@ function updatePopupIndicator(reader: any): void {
     const doc = getReaderWindow(reader)?.document;
     const popup = doc?.querySelector(".selection-popup");
     if (!doc || !popup) return;
-    let indicator = popup.querySelector(".color-keys-mode");
-    if (!indicator) {
-      indicator = doc.createElement("div");
-      indicator.className = "color-keys-mode";
+    const colors = popup.querySelector(".colors");
+    if (!colors) return;
 
-      const underline = doc.createElement("span");
-      underline.className = "ck-icon ck-underline";
-      underline.textContent = "Aa";
-
-      const highlight = doc.createElement("span");
-      highlight.className = "ck-icon ck-highlight";
-      highlight.textContent = "Aa";
-
-      const hint = doc.createElement("span");
-      hint.className = "ck-hint";
-      hint.textContent = String((Zotero as any).locale ?? "").startsWith("zh")
-        ? "Ctrl 切换高亮"
-        : "Ctrl for highlight";
-
-      indicator.append(underline, highlight, hint);
-      const colors = popup.querySelector(".colors");
-      if (colors?.parentElement) {
-        colors.parentElement.insertBefore(indicator, colors.nextElementSibling);
-      } else {
-        popup.appendChild(indicator);
-      }
+    let badge = colors.querySelector(".color-keys-mode-badge");
+    if (!badge) {
+      badge = doc.createElement("span");
+      badge.className = "color-keys-mode-badge";
+      badge.textContent = "Aa";
+      badge.setAttribute(
+        "title",
+        String((Zotero as any).locale ?? "").startsWith("zh")
+          ? "默认下划线，按住 Ctrl 切换高亮"
+          : "Underline by default, hold Ctrl for highlight",
+      );
+      colors.insertBefore(badge, colors.firstChild);
     }
 
-    const colors = getLastColors(reader);
-    (indicator as any).style.setProperty("--ck-underline-color", colors.underline);
-    (indicator as any).style.setProperty("--ck-highlight-color", colors.highlight);
+    const last = getLastColors(reader);
+    (badge as any).style.setProperty("--ck-underline-color", last.underline);
+    (badge as any).style.setProperty("--ck-highlight-color", last.highlight);
+
+    let hint = popup.querySelector(".color-keys-hint");
+    if (!hint) {
+      hint = doc.createElement("div");
+      hint.className = "color-keys-hint";
+      hint.textContent = String((Zotero as any).locale ?? "").startsWith("zh")
+        ? "按住 Ctrl 点色 = 高亮"
+        : "Hold Ctrl + click a color for highlight";
+      colors.insertAdjacentElement("afterend", hint);
+    }
   } catch (error) {
     recordError("updatePopupIndicator", error);
   }
@@ -273,8 +232,7 @@ function installSelectionPopup(reader: any, doc: any): void {
       "click",
       (event: any) => {
         try {
-          const target = event.target as any;
-          const button = target?.closest?.("button.color-button");
+          const button = (event.target as any)?.closest?.("button.color-button");
           if (!button) return;
           const row = button.closest(".colors");
           if (!row) return;
@@ -311,23 +269,10 @@ function onReaderKeyDown(reader: any, event: any): void {
     const accelKey = Zotero.isMac ? "Meta" : "Control";
     if (event.key === accelKey) setCtrlState(reader, true);
 
-    // Tab / Shift+Tab：从侧栏注释输入框跳回阅读器正文
-    if (
-      event.key === "Tab" &&
-      isTextBoxTarget(event.target) &&
-      getPref("pdfTabRefocus") !== false
-    ) {
-      event.preventDefault();
-      event.stopPropagation();
-      focusReaderView(reader);
-      return;
-    }
-
-    if (isTextBoxTarget(event.target)) return;
-
     const keymap = getKeymap();
     const pdfCommand = resolvePdfColorCommand(event, Zotero.isMac, keymap);
     if (pdfCommand) {
+      // 注释输入框聚焦时也生效；由于组合键必含 Alt，不会干扰普通输入
       if (applyColor(reader, pdfCommand.type, pdfCommand.color)) {
         event.preventDefault();
         event.stopPropagation();
@@ -371,9 +316,17 @@ function attachWindow(reader: any, win: any): void {
     win.addEventListener("keyup", (event: any) => onReaderKeyUp(reader, event), true);
     windows.add(win);
     attachedReaders.add(reader);
-    diagnostics.pdfReaders = attachedReaders.size;
   } catch (error) {
     recordError("attachWindow", error);
+  }
+}
+
+function syncReaderCount(): void {
+  try {
+    const readers = (Zotero as any).Reader?._readers ?? [];
+    diagnostics.pdfReaders = readers.length;
+  } catch {
+    diagnostics.pdfReaders = 0;
   }
 }
 
@@ -401,6 +354,7 @@ export function installPdfBridge(): boolean {
     if (!Reader) return false;
 
     for (const reader of Reader._readers ?? []) ensureReaderListeners(reader);
+    syncReaderCount();
 
     renderToolbarHandler = (event: any) => {
       try {
@@ -433,6 +387,7 @@ export function installPdfBridge(): boolean {
           for (const reader of (Zotero as any).Reader?._readers ?? []) {
             ensureReaderListeners(reader);
           }
+          syncReaderCount();
         } catch (error) {
           recordError("pollReaders", error);
         }
@@ -457,10 +412,7 @@ export function uninstallPdfBridge(): void {
         Reader.unregisterEventListener("renderToolbar", renderToolbarHandler);
       }
       if (selectionPopupHandler) {
-        Reader.unregisterEventListener(
-          "renderTextSelectionPopup",
-          selectionPopupHandler,
-        );
+        Reader.unregisterEventListener("renderTextSelectionPopup", selectionPopupHandler);
       }
     }
   } catch {
