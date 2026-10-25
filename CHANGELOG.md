@@ -11,6 +11,8 @@ All notable changes to this project are documented in this file.
 
 ### Notes
 
+- Keyboard listener is attached to both the reader UI window and the PDF.js view iframe (reader UI alone never sees keys while focus is in the PDF body)
+- Selecting over an existing highlight recolors it instead of stacking a new annotation
 - Requires user testing on real PDFs before promoting to 0.2.0
 - Reader toolbar redesign (second UX scheme) still pending
 
